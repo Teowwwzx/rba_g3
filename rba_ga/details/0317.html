@@ -1,0 +1,2287 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>EPB GROUP BERHAD (0317) - Data Details</title>
+                            <style>
+                                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #333; padding: 20px; margin: 0; }
+                                .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+                                h1 { color: #2c3e50; margin-bottom: 10px; }
+                                .header-info { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+                                .back-link { display: inline-block; margin-bottom: 20px; color: #3498db; text-decoration: none; font-weight: 500; }
+                                .back-link:hover { text-decoration: underline; }
+                                
+                                .formula-box { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3498db; }
+                                .formula-title { font-weight: 600; margin-bottom: 5px; color: #2c3e50; }
+                                code { background-color: #e9ecef; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+                                
+                                .controls { margin-bottom: 15px; text-align: right; }
+                                select { padding: 8px 12px; border-radius: 4px; border: 1px solid #ddd; font-size: 14px; }
+                                
+                                table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em; }
+                                th, td { padding: 10px 15px; text-align: left; border-bottom: 1px solid #eee; }
+                                th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; position: sticky; top: 0; }
+                                .num { text-align: right; font-family: monospace; }
+                                .pos { color: #155724; }
+                                .neg { color: #721c24; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <a href="../ace_market_summary.html" class="back-link">&larr; Back to Summary</a>
+                                
+                                <div class="header-info">
+                                    <h1>EPB GROUP BERHAD (0317)</h1>
+                                    <p><strong>Source:</strong> <a href="https://finance.yahoo.com/quote/0317.KL" target="_blank">Yahoo Finance (0317.KL)</a></p>
+                                    <p><strong>Last Price:</strong> RM 0.380</p>
+                                    <p><strong>First Data Date:</strong> 2024-08-23</p>
+                                    <p><strong>Average Daily Return:</strong> -0.1215%</p>
+                                </div>
+                                
+                                <div class="formula-box">
+                                    <div class="formula-title">How is this calculated?</div>
+                                    <p><strong>Daily Return</strong> = (Price<sub>Today</sub> - Price<sub>Yesterday</sub>) / Price<sub>Yesterday</sub></p>
+                                    <p><strong>Avg Daily Return</strong> = Average of all "Daily Return" values shown below.</p>
+                                    
+                                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #bdc3c7;">
+                                        <div class="formula-title">Example (Latest Data):</div>
+                                        <p>
+                                            <strong>Date:</strong> 2025-11-28<br>
+                                            <strong>Price Today:</strong> 0.3800<br>
+                                            <strong>Price Yesterday:</strong> 0.3900
+                                        </p>
+                                        <p style="font-family: monospace; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                                            (0.3800 - 0.3900) / 0.3900 = <strong>-0.025641</strong> (-2.5641%)
+                                        </p>
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="controls">
+                                    <label for="yearFilter">Filter by Year: </label>
+                                    <select id="yearFilter" onchange="filterByYear()">
+                                        <option value="all">All Years</option>
+                                        <option value="2025">2025</option><option value="2024">2024</option>
+                                    </select>
+                                </div>
+
+                                <table id="dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th class="num">Adj Close Price</th>
+                                            <th class="num">Daily Return</th>
+                                            <th class="num">Daily Return %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        
+                                        <tr data-year="2025">
+                                            <td>2025-11-28</td>
+                                            <td class="num">0.3800</td>
+                                            <td class="num neg">-0.025641</td>
+                                            <td class="num neg">-2.5641%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-27</td>
+                                            <td class="num">0.3900</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-26</td>
+                                            <td class="num">0.3900</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-25</td>
+                                            <td class="num">0.3900</td>
+                                            <td class="num neg">-0.025000</td>
+                                            <td class="num neg">-2.5000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-24</td>
+                                            <td class="num">0.4000</td>
+                                            <td class="num neg">-0.024390</td>
+                                            <td class="num neg">-2.4390%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-21</td>
+                                            <td class="num">0.4100</td>
+                                            <td class="num pos">0.037975</td>
+                                            <td class="num pos">3.7975%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-20</td>
+                                            <td class="num">0.3950</td>
+                                            <td class="num neg">-0.012500</td>
+                                            <td class="num neg">-1.2500%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-19</td>
+                                            <td class="num">0.4000</td>
+                                            <td class="num pos">0.012658</td>
+                                            <td class="num pos">1.2658%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-18</td>
+                                            <td class="num">0.3950</td>
+                                            <td class="num neg">-0.012500</td>
+                                            <td class="num neg">-1.2500%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-17</td>
+                                            <td class="num">0.4000</td>
+                                            <td class="num pos">0.038961</td>
+                                            <td class="num pos">3.8961%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-14</td>
+                                            <td class="num">0.3850</td>
+                                            <td class="num pos">0.013158</td>
+                                            <td class="num pos">1.3158%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-13</td>
+                                            <td class="num">0.3800</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-12</td>
+                                            <td class="num">0.3800</td>
+                                            <td class="num pos">0.027027</td>
+                                            <td class="num pos">2.7027%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-11</td>
+                                            <td class="num">0.3700</td>
+                                            <td class="num neg">-0.051282</td>
+                                            <td class="num neg">-5.1282%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-10</td>
+                                            <td class="num">0.3900</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-07</td>
+                                            <td class="num">0.3900</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-06</td>
+                                            <td class="num">0.3900</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-05</td>
+                                            <td class="num">0.3900</td>
+                                            <td class="num pos">0.026316</td>
+                                            <td class="num pos">2.6316%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-04</td>
+                                            <td class="num">0.3800</td>
+                                            <td class="num neg">-0.025000</td>
+                                            <td class="num neg">-2.5000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-11-03</td>
+                                            <td class="num">0.3897</td>
+                                            <td class="num neg">-0.024390</td>
+                                            <td class="num neg">-2.4390%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-31</td>
+                                            <td class="num">0.3995</td>
+                                            <td class="num pos">0.012346</td>
+                                            <td class="num pos">1.2346%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-30</td>
+                                            <td class="num">0.3946</td>
+                                            <td class="num pos">0.025316</td>
+                                            <td class="num pos">2.5316%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-29</td>
+                                            <td class="num">0.3849</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-28</td>
+                                            <td class="num">0.3849</td>
+                                            <td class="num pos">0.025974</td>
+                                            <td class="num pos">2.5974%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-27</td>
+                                            <td class="num">0.3751</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-24</td>
+                                            <td class="num">0.3751</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-23</td>
+                                            <td class="num">0.3751</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-22</td>
+                                            <td class="num">0.3751</td>
+                                            <td class="num neg">-0.025316</td>
+                                            <td class="num neg">-2.5316%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-21</td>
+                                            <td class="num">0.3849</td>
+                                            <td class="num neg">-0.012500</td>
+                                            <td class="num neg">-1.2500%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-17</td>
+                                            <td class="num">0.3897</td>
+                                            <td class="num neg">-0.024390</td>
+                                            <td class="num neg">-2.4390%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-16</td>
+                                            <td class="num">0.3995</td>
+                                            <td class="num pos">0.064935</td>
+                                            <td class="num pos">6.4935%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-15</td>
+                                            <td class="num">0.3751</td>
+                                            <td class="num pos">0.013158</td>
+                                            <td class="num pos">1.3158%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-14</td>
+                                            <td class="num">0.3703</td>
+                                            <td class="num neg">-0.037975</td>
+                                            <td class="num neg">-3.7975%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-13</td>
+                                            <td class="num">0.3849</td>
+                                            <td class="num neg">-0.024691</td>
+                                            <td class="num neg">-2.4691%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-10</td>
+                                            <td class="num">0.3946</td>
+                                            <td class="num pos">0.012500</td>
+                                            <td class="num pos">1.2500%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-09</td>
+                                            <td class="num">0.3897</td>
+                                            <td class="num pos">0.025641</td>
+                                            <td class="num pos">2.5641%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-08</td>
+                                            <td class="num">0.3800</td>
+                                            <td class="num neg">-0.012658</td>
+                                            <td class="num neg">-1.2658%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-07</td>
+                                            <td class="num">0.3849</td>
+                                            <td class="num neg">-0.012500</td>
+                                            <td class="num neg">-1.2500%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-06</td>
+                                            <td class="num">0.3897</td>
+                                            <td class="num neg">-0.047619</td>
+                                            <td class="num neg">-4.7619%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-03</td>
+                                            <td class="num">0.4092</td>
+                                            <td class="num pos">0.037037</td>
+                                            <td class="num pos">3.7037%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-02</td>
+                                            <td class="num">0.3946</td>
+                                            <td class="num neg">-0.035714</td>
+                                            <td class="num neg">-3.5714%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-10-01</td>
+                                            <td class="num">0.4092</td>
+                                            <td class="num neg">-0.034483</td>
+                                            <td class="num neg">-3.4483%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-30</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-29</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.035714</td>
+                                            <td class="num pos">3.5714%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-26</td>
+                                            <td class="num">0.4092</td>
+                                            <td class="num pos">0.050000</td>
+                                            <td class="num pos">5.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-25</td>
+                                            <td class="num">0.3897</td>
+                                            <td class="num neg">-0.090909</td>
+                                            <td class="num neg">-9.0909%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-24</td>
+                                            <td class="num">0.4287</td>
+                                            <td class="num pos">0.100000</td>
+                                            <td class="num pos">10.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-23</td>
+                                            <td class="num">0.3897</td>
+                                            <td class="num neg">-0.012346</td>
+                                            <td class="num neg">-1.2346%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-22</td>
+                                            <td class="num">0.3946</td>
+                                            <td class="num neg">-0.035714</td>
+                                            <td class="num neg">-3.5714%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-19</td>
+                                            <td class="num">0.4092</td>
+                                            <td class="num neg">-0.034483</td>
+                                            <td class="num neg">-3.4483%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-18</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-17</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.011628</td>
+                                            <td class="num pos">1.1628%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-12</td>
+                                            <td class="num">0.4190</td>
+                                            <td class="num neg">-0.011494</td>
+                                            <td class="num neg">-1.1494%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-11</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-10</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-09</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-08</td>
+                                            <td class="num">0.4238</td>
+                                            <td class="num pos">0.023529</td>
+                                            <td class="num pos">2.3529%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-04</td>
+                                            <td class="num">0.4141</td>
+                                            <td class="num neg">-0.034091</td>
+                                            <td class="num neg">-3.4091%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-03</td>
+                                            <td class="num">0.4287</td>
+                                            <td class="num pos">0.023256</td>
+                                            <td class="num pos">2.3256%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-09-02</td>
+                                            <td class="num">0.4190</td>
+                                            <td class="num neg">-0.044444</td>
+                                            <td class="num neg">-4.4444%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-29</td>
+                                            <td class="num">0.4385</td>
+                                            <td class="num neg">-0.021739</td>
+                                            <td class="num neg">-2.1739%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-28</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-27</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-26</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-25</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-22</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-21</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.022222</td>
+                                            <td class="num pos">2.2222%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-20</td>
+                                            <td class="num">0.4385</td>
+                                            <td class="num neg">-0.021739</td>
+                                            <td class="num neg">-2.1739%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-19</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.033708</td>
+                                            <td class="num pos">3.3708%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-18</td>
+                                            <td class="num">0.4336</td>
+                                            <td class="num neg">-0.043011</td>
+                                            <td class="num neg">-4.3011%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-15</td>
+                                            <td class="num">0.4531</td>
+                                            <td class="num neg">-0.021053</td>
+                                            <td class="num neg">-2.1053%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-14</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-13</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-12</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num neg">-0.010417</td>
+                                            <td class="num neg">-1.0417%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-11</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-08</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-07</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num neg">-0.010309</td>
+                                            <td class="num neg">-1.0309%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-06</td>
+                                            <td class="num">0.4726</td>
+                                            <td class="num neg">-0.030000</td>
+                                            <td class="num neg">-3.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-05</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-04</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-08-01</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-31</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-30</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.020408</td>
+                                            <td class="num pos">2.0408%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-29</td>
+                                            <td class="num">0.4774</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-28</td>
+                                            <td class="num">0.4774</td>
+                                            <td class="num pos">0.010309</td>
+                                            <td class="num pos">1.0309%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-25</td>
+                                            <td class="num">0.4726</td>
+                                            <td class="num neg">-0.010204</td>
+                                            <td class="num neg">-1.0204%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-24</td>
+                                            <td class="num">0.4774</td>
+                                            <td class="num pos">0.020833</td>
+                                            <td class="num pos">2.0833%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-23</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num neg">-0.040000</td>
+                                            <td class="num neg">-4.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-22</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-21</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-18</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num neg">-0.019608</td>
+                                            <td class="num neg">-1.9608%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-17</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-16</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-15</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-14</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-11</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-10</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-09</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.009901</td>
+                                            <td class="num pos">0.9901%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-08</td>
+                                            <td class="num">0.4921</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-07</td>
+                                            <td class="num">0.4921</td>
+                                            <td class="num neg">-0.019417</td>
+                                            <td class="num neg">-1.9417%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-04</td>
+                                            <td class="num">0.5018</td>
+                                            <td class="num neg">-0.009615</td>
+                                            <td class="num neg">-0.9615%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-03</td>
+                                            <td class="num">0.5067</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-02</td>
+                                            <td class="num">0.5067</td>
+                                            <td class="num pos">0.029703</td>
+                                            <td class="num pos">2.9703%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-07-01</td>
+                                            <td class="num">0.4921</td>
+                                            <td class="num neg">-0.047170</td>
+                                            <td class="num neg">-4.7170%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-30</td>
+                                            <td class="num">0.5164</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-26</td>
+                                            <td class="num">0.5164</td>
+                                            <td class="num neg">-0.018519</td>
+                                            <td class="num neg">-1.8519%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-25</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.009346</td>
+                                            <td class="num pos">0.9346%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-24</td>
+                                            <td class="num">0.5213</td>
+                                            <td class="num neg">-0.009259</td>
+                                            <td class="num neg">-0.9259%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-23</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-20</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-19</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-18</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.009346</td>
+                                            <td class="num pos">0.9346%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-17</td>
+                                            <td class="num">0.5213</td>
+                                            <td class="num neg">-0.018349</td>
+                                            <td class="num neg">-1.8349%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-16</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-13</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num neg">-0.009091</td>
+                                            <td class="num neg">-0.9091%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-12</td>
+                                            <td class="num">0.5359</td>
+                                            <td class="num pos">0.009174</td>
+                                            <td class="num pos">0.9174%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-11</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num pos">0.009259</td>
+                                            <td class="num pos">0.9259%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-10</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.038462</td>
+                                            <td class="num pos">3.8462%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-09</td>
+                                            <td class="num">0.5067</td>
+                                            <td class="num pos">0.019608</td>
+                                            <td class="num pos">1.9608%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-06</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.020000</td>
+                                            <td class="num pos">2.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-05</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.041667</td>
+                                            <td class="num pos">4.1667%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-04</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num pos">0.032258</td>
+                                            <td class="num pos">3.2258%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-06-03</td>
+                                            <td class="num">0.4531</td>
+                                            <td class="num pos">0.010870</td>
+                                            <td class="num pos">1.0870%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-30</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-29</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.022222</td>
+                                            <td class="num pos">2.2222%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-28</td>
+                                            <td class="num">0.4385</td>
+                                            <td class="num pos">0.011236</td>
+                                            <td class="num pos">1.1236%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-27</td>
+                                            <td class="num">0.4336</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-26</td>
+                                            <td class="num">0.4336</td>
+                                            <td class="num neg">-0.021978</td>
+                                            <td class="num neg">-2.1978%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-23</td>
+                                            <td class="num">0.4433</td>
+                                            <td class="num pos">0.011111</td>
+                                            <td class="num pos">1.1111%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-22</td>
+                                            <td class="num">0.4385</td>
+                                            <td class="num neg">-0.032258</td>
+                                            <td class="num neg">-3.2258%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-21</td>
+                                            <td class="num">0.4531</td>
+                                            <td class="num pos">0.033333</td>
+                                            <td class="num pos">3.3333%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-20</td>
+                                            <td class="num">0.4385</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-19</td>
+                                            <td class="num">0.4385</td>
+                                            <td class="num neg">-0.021739</td>
+                                            <td class="num neg">-2.1739%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-16</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num pos">0.010989</td>
+                                            <td class="num pos">1.0989%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-15</td>
+                                            <td class="num">0.4433</td>
+                                            <td class="num neg">-0.021505</td>
+                                            <td class="num neg">-2.1505%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-14</td>
+                                            <td class="num">0.4531</td>
+                                            <td class="num neg">-0.021053</td>
+                                            <td class="num neg">-2.1053%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-13</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num neg">-0.020619</td>
+                                            <td class="num neg">-2.0619%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-09</td>
+                                            <td class="num">0.4726</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-08</td>
+                                            <td class="num">0.4726</td>
+                                            <td class="num neg">-0.020202</td>
+                                            <td class="num neg">-2.0202%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-07</td>
+                                            <td class="num">0.4823</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-06</td>
+                                            <td class="num">0.4823</td>
+                                            <td class="num pos">0.053192</td>
+                                            <td class="num pos">5.3192%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-05</td>
+                                            <td class="num">0.4579</td>
+                                            <td class="num neg">-0.020833</td>
+                                            <td class="num neg">-2.0833%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-05-02</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num pos">0.021277</td>
+                                            <td class="num pos">2.1277%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-30</td>
+                                            <td class="num">0.4579</td>
+                                            <td class="num neg">-0.060000</td>
+                                            <td class="num neg">-6.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-29</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-28</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-25</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.041667</td>
+                                            <td class="num pos">4.1667%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-24</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num neg">-0.010309</td>
+                                            <td class="num neg">-1.0309%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-23</td>
+                                            <td class="num">0.4726</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-22</td>
+                                            <td class="num">0.4726</td>
+                                            <td class="num neg">-0.039604</td>
+                                            <td class="num neg">-3.9604%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-21</td>
+                                            <td class="num">0.4921</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-18</td>
+                                            <td class="num">0.4921</td>
+                                            <td class="num pos">0.010000</td>
+                                            <td class="num pos">1.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-17</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.020408</td>
+                                            <td class="num pos">2.0408%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-16</td>
+                                            <td class="num">0.4774</td>
+                                            <td class="num pos">0.042553</td>
+                                            <td class="num pos">4.2553%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-15</td>
+                                            <td class="num">0.4579</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-14</td>
+                                            <td class="num">0.4579</td>
+                                            <td class="num pos">0.021739</td>
+                                            <td class="num pos">2.1739%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-11</td>
+                                            <td class="num">0.4482</td>
+                                            <td class="num neg">-0.031579</td>
+                                            <td class="num neg">-3.1579%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-10</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num pos">0.010638</td>
+                                            <td class="num pos">1.0638%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-09</td>
+                                            <td class="num">0.4579</td>
+                                            <td class="num neg">-0.030928</td>
+                                            <td class="num neg">-3.0928%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-08</td>
+                                            <td class="num">0.4726</td>
+                                            <td class="num pos">0.010417</td>
+                                            <td class="num pos">1.0417%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-07</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num neg">-0.094340</td>
+                                            <td class="num neg">-9.4340%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-04</td>
+                                            <td class="num">0.5164</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-03</td>
+                                            <td class="num">0.5164</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-04-02</td>
+                                            <td class="num">0.5164</td>
+                                            <td class="num neg">-0.009346</td>
+                                            <td class="num neg">-0.9346%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-28</td>
+                                            <td class="num">0.5213</td>
+                                            <td class="num pos">0.049020</td>
+                                            <td class="num pos">4.9020%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-27</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-26</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.020000</td>
+                                            <td class="num pos">2.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-25</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num neg">-0.065421</td>
+                                            <td class="num neg">-6.5421%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-24</td>
+                                            <td class="num">0.5213</td>
+                                            <td class="num pos">0.028846</td>
+                                            <td class="num pos">2.8846%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-21</td>
+                                            <td class="num">0.5067</td>
+                                            <td class="num pos">0.019608</td>
+                                            <td class="num pos">1.9608%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-20</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.040816</td>
+                                            <td class="num pos">4.0816%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-19</td>
+                                            <td class="num">0.4774</td>
+                                            <td class="num pos">0.031579</td>
+                                            <td class="num pos">3.1579%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-17</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-14</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-13</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-12</td>
+                                            <td class="num">0.4628</td>
+                                            <td class="num neg">-0.010417</td>
+                                            <td class="num neg">-1.0417%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-11</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num neg">-0.020408</td>
+                                            <td class="num neg">-2.0408%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-10</td>
+                                            <td class="num">0.4774</td>
+                                            <td class="num pos">0.076923</td>
+                                            <td class="num pos">7.6923%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-07</td>
+                                            <td class="num">0.4433</td>
+                                            <td class="num neg">-0.090000</td>
+                                            <td class="num neg">-9.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-06</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-05</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num pos">0.010101</td>
+                                            <td class="num pos">1.0101%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-04</td>
+                                            <td class="num">0.4823</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-03-03</td>
+                                            <td class="num">0.4823</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-28</td>
+                                            <td class="num">0.4823</td>
+                                            <td class="num pos">0.031250</td>
+                                            <td class="num pos">3.1250%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-27</td>
+                                            <td class="num">0.4677</td>
+                                            <td class="num neg">-0.040000</td>
+                                            <td class="num neg">-4.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-26</td>
+                                            <td class="num">0.4872</td>
+                                            <td class="num neg">-0.019608</td>
+                                            <td class="num neg">-1.9608%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-25</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-24</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-21</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-20</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-19</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-18</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-17</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-14</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-13</td>
+                                            <td class="num">0.4969</td>
+                                            <td class="num neg">-0.019231</td>
+                                            <td class="num neg">-1.9231%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-12</td>
+                                            <td class="num">0.5067</td>
+                                            <td class="num neg">-0.028037</td>
+                                            <td class="num neg">-2.8037%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-10</td>
+                                            <td class="num">0.5213</td>
+                                            <td class="num pos">0.009434</td>
+                                            <td class="num pos">0.9434%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-07</td>
+                                            <td class="num">0.5164</td>
+                                            <td class="num neg">-0.018519</td>
+                                            <td class="num neg">-1.8519%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-06</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.038462</td>
+                                            <td class="num pos">3.8462%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-05</td>
+                                            <td class="num">0.5067</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-04</td>
+                                            <td class="num">0.5067</td>
+                                            <td class="num neg">-0.045872</td>
+                                            <td class="num neg">-4.5872%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-02-03</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-31</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-28</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num pos">0.028302</td>
+                                            <td class="num pos">2.8302%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-27</td>
+                                            <td class="num">0.5164</td>
+                                            <td class="num neg">-0.018519</td>
+                                            <td class="num neg">-1.8519%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-24</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num neg">-0.018182</td>
+                                            <td class="num neg">-1.8182%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-23</td>
+                                            <td class="num">0.5359</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-22</td>
+                                            <td class="num">0.5359</td>
+                                            <td class="num pos">0.028037</td>
+                                            <td class="num pos">2.8037%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-21</td>
+                                            <td class="num">0.5213</td>
+                                            <td class="num neg">-0.009259</td>
+                                            <td class="num neg">-0.9259%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-20</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num neg">-0.009174</td>
+                                            <td class="num neg">-0.9174%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-17</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num neg">-0.009091</td>
+                                            <td class="num neg">-0.9091%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-16</td>
+                                            <td class="num">0.5359</td>
+                                            <td class="num neg">-0.017857</td>
+                                            <td class="num neg">-1.7857%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-15</td>
+                                            <td class="num">0.5456</td>
+                                            <td class="num pos">0.037037</td>
+                                            <td class="num pos">3.7037%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-14</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-13</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-10</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-09</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-08</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-07</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num neg">-0.009174</td>
+                                            <td class="num neg">-0.9174%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-06</td>
+                                            <td class="num">0.5310</td>
+                                            <td class="num pos">0.009259</td>
+                                            <td class="num pos">0.9259%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-03</td>
+                                            <td class="num">0.5262</td>
+                                            <td class="num neg">-0.018182</td>
+                                            <td class="num neg">-1.8182%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2025">
+                                            <td>2025-01-02</td>
+                                            <td class="num">0.5359</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-31</td>
+                                            <td class="num">0.5359</td>
+                                            <td class="num neg">-0.017857</td>
+                                            <td class="num neg">-1.7857%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-30</td>
+                                            <td class="num">0.5456</td>
+                                            <td class="num neg">-0.008850</td>
+                                            <td class="num neg">-0.8850%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-27</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-26</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-24</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-23</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-20</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-19</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num neg">-0.017391</td>
+                                            <td class="num neg">-1.7391%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-18</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num pos">0.008772</td>
+                                            <td class="num pos">0.8772%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-17</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num neg">-0.008696</td>
+                                            <td class="num neg">-0.8696%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-16</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num neg">-0.008621</td>
+                                            <td class="num neg">-0.8621%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-13</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num neg">-0.008547</td>
+                                            <td class="num neg">-0.8547%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-12</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-11</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num pos">0.026316</td>
+                                            <td class="num pos">2.6316%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-10</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-09</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num neg">-0.042017</td>
+                                            <td class="num neg">-4.2017%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-06</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num neg">-0.008333</td>
+                                            <td class="num neg">-0.8333%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-05</td>
+                                            <td class="num">0.5846</td>
+                                            <td class="num neg">-0.008264</td>
+                                            <td class="num neg">-0.8264%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-04</td>
+                                            <td class="num">0.5895</td>
+                                            <td class="num pos">0.008333</td>
+                                            <td class="num pos">0.8333%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-03</td>
+                                            <td class="num">0.5846</td>
+                                            <td class="num pos">0.034483</td>
+                                            <td class="num pos">3.4483%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-12-02</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num neg">-0.025210</td>
+                                            <td class="num neg">-2.5210%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-29</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num pos">0.008475</td>
+                                            <td class="num pos">0.8475%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-28</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num pos">0.035088</td>
+                                            <td class="num pos">3.5088%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-27</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num pos">0.008850</td>
+                                            <td class="num pos">0.8850%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-26</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-25</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num neg">-0.017391</td>
+                                            <td class="num neg">-1.7391%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-22</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-21</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num pos">0.036036</td>
+                                            <td class="num pos">3.6036%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-20</td>
+                                            <td class="num">0.5408</td>
+                                            <td class="num neg">-0.026316</td>
+                                            <td class="num neg">-2.6316%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-19</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num neg">-0.025641</td>
+                                            <td class="num neg">-2.5641%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-18</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num pos">0.008621</td>
+                                            <td class="num pos">0.8621%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-15</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num pos">0.017544</td>
+                                            <td class="num pos">1.7544%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-14</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num neg">-0.017241</td>
+                                            <td class="num neg">-1.7241%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-13</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-12</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num neg">-0.008547</td>
+                                            <td class="num neg">-0.8547%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-11</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-08</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num pos">0.017391</td>
+                                            <td class="num pos">1.7391%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-07</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-06</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-05</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num neg">-0.017094</td>
+                                            <td class="num neg">-1.7094%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-04</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-11-01</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num neg">-0.016807</td>
+                                            <td class="num neg">-1.6807%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-30</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num pos">0.025862</td>
+                                            <td class="num pos">2.5862%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-29</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num pos">0.008696</td>
+                                            <td class="num pos">0.8696%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-28</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num neg">-0.008621</td>
+                                            <td class="num neg">-0.8621%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-25</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-24</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num neg">-0.008547</td>
+                                            <td class="num neg">-0.8547%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-23</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num neg">-0.008475</td>
+                                            <td class="num neg">-0.8475%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-22</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num pos">0.008547</td>
+                                            <td class="num pos">0.8547%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-21</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num neg">-0.016807</td>
+                                            <td class="num neg">-1.6807%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-18</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-17</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num neg">-0.008333</td>
+                                            <td class="num neg">-0.8333%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-16</td>
+                                            <td class="num">0.5846</td>
+                                            <td class="num pos">0.016949</td>
+                                            <td class="num pos">1.6949%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-15</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num neg">-0.008403</td>
+                                            <td class="num neg">-0.8403%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-14</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num neg">-0.008333</td>
+                                            <td class="num neg">-0.8333%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-11</td>
+                                            <td class="num">0.5846</td>
+                                            <td class="num pos">0.016949</td>
+                                            <td class="num pos">1.6949%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-10</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num pos">0.035088</td>
+                                            <td class="num pos">3.5088%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-09</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num neg">-0.017241</td>
+                                            <td class="num neg">-1.7241%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-08</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-07</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-04</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num pos">0.008696</td>
+                                            <td class="num pos">0.8696%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-03</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num neg">-0.017094</td>
+                                            <td class="num neg">-1.7094%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-02</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num neg">-0.008475</td>
+                                            <td class="num neg">-0.8475%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-10-01</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num pos">0.017241</td>
+                                            <td class="num pos">1.7241%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-30</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num neg">-0.025210</td>
+                                            <td class="num neg">-2.5210%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-27</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num pos">0.025862</td>
+                                            <td class="num pos">2.5862%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-26</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num neg">-0.025210</td>
+                                            <td class="num neg">-2.5210%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-25</td>
+                                            <td class="num">0.5797</td>
+                                            <td class="num pos">0.008475</td>
+                                            <td class="num pos">0.8475%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-24</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num neg">-0.016667</td>
+                                            <td class="num neg">-1.6667%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-23</td>
+                                            <td class="num">0.5846</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-20</td>
+                                            <td class="num">0.5846</td>
+                                            <td class="num pos">0.043478</td>
+                                            <td class="num pos">4.3478%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-19</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-18</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num pos">0.008772</td>
+                                            <td class="num pos">0.8772%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-17</td>
+                                            <td class="num">0.5554</td>
+                                            <td class="num pos">0.017857</td>
+                                            <td class="num pos">1.7857%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-13</td>
+                                            <td class="num">0.5456</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-12</td>
+                                            <td class="num">0.5456</td>
+                                            <td class="num neg">-0.008850</td>
+                                            <td class="num neg">-0.8850%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-11</td>
+                                            <td class="num">0.5505</td>
+                                            <td class="num pos">0.008929</td>
+                                            <td class="num pos">0.8929%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-10</td>
+                                            <td class="num">0.5456</td>
+                                            <td class="num pos">0.000000</td>
+                                            <td class="num pos">0.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-09</td>
+                                            <td class="num">0.5456</td>
+                                            <td class="num neg">-0.026087</td>
+                                            <td class="num neg">-2.6087%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-06</td>
+                                            <td class="num">0.5603</td>
+                                            <td class="num neg">-0.017094</td>
+                                            <td class="num neg">-1.7094%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-05</td>
+                                            <td class="num">0.5700</td>
+                                            <td class="num neg">-0.008475</td>
+                                            <td class="num neg">-0.8475%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-04</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num neg">-0.032787</td>
+                                            <td class="num neg">-3.2787%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-03</td>
+                                            <td class="num">0.5944</td>
+                                            <td class="num pos">0.008264</td>
+                                            <td class="num pos">0.8264%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-09-02</td>
+                                            <td class="num">0.5895</td>
+                                            <td class="num pos">0.025424</td>
+                                            <td class="num pos">2.5424%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-08-30</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num pos">0.017241</td>
+                                            <td class="num pos">1.7241%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-08-29</td>
+                                            <td class="num">0.5651</td>
+                                            <td class="num neg">-0.016949</td>
+                                            <td class="num neg">-1.6949%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-08-28</td>
+                                            <td class="num">0.5749</td>
+                                            <td class="num neg">-0.016667</td>
+                                            <td class="num neg">-1.6667%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-08-27</td>
+                                            <td class="num">0.5846</td>
+                                            <td class="num neg">-0.040000</td>
+                                            <td class="num neg">-4.0000%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-08-26</td>
+                                            <td class="num">0.6090</td>
+                                            <td class="num pos">0.008065</td>
+                                            <td class="num pos">0.8065%</td>
+                                        </tr>
+                            
+                                        <tr data-year="2024">
+                                            <td>2024-08-23</td>
+                                            <td class="num">0.6041</td>
+                                            <td class="num ">-</td>
+                                            <td class="num ">-</td>
+                                        </tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <script>
+                                function filterByYear() {
+                                    var filter = document.getElementById("yearFilter").value;
+                                    var table = document.getElementById("dataTable");
+                                    var tr = table.getElementsByTagName("tr");
+                                    
+                                    for (var i = 1; i < tr.length; i++) {
+                                        var rowYear = tr[i].getAttribute("data-year");
+                                        if (filter === "all" || rowYear === filter) {
+                                            tr[i].style.display = "";
+                                        } else {
+                                            tr[i].style.display = "none";
+                                        }
+                                    }
+                                }
+                            </script>
+                        </body>
+                        </html>
+                        
