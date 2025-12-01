@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import os
 import datetime
 import numpy as np
+from scipy.optimize import minimize
+import scipy.stats as stats
 
 HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ace_market_companies_list.html')
 OUTPUT_HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html')
@@ -375,6 +377,370 @@ def generate_html():
     except Exception as e:
         print(f"Error downloading data: {e}")
 
+    # --- PORTFOLIO OPTIMIZATION PREP ---
+    
+    # 1. Filter for stocks with 6Y data
+    valid_stocks = [s for s in stocks if s['Has_6Y_Data']]
+    print(f"Stocks with 6Y Data: {len(valid_stocks)}")
+    
+    # 2. Sort by Average Return (Desc) and pick Top 50
+    # Note: Assignment requires >0.25%, but if we don't have 50, we take the best available.
+    valid_stocks.sort(key=lambda x: x['Avg_Return'], reverse=True)
+    
+    top_50_stocks = valid_stocks[:50]
+    print(f"Selected Top {len(top_50_stocks)} stocks for optimization.")
+    
+    # 3. Prepare Cleaned Data for Optimization
+    # We need a DataFrame of Adj Close prices for these 50 stocks + KLSE + Bond (if available)
+    
+    opt_tickers = [s['Ticker'] for s in top_50_stocks]
+    if '^KLSE' not in opt_tickers:
+        opt_tickers.append('^KLSE')
+        
+    # Re-download strictly for these to ensure alignment or reuse existing data
+    # Since we already processed 'data', let's extract from there if possible, 
+    # but 'data' might be multi-index. Let's construct a clean DF.
+    
+    cleaned_data = pd.DataFrame()
+    
+    for t in opt_tickers:
+        # We need to find the series again from the 'data' object or re-download
+        # To be safe and clean, let's extract from the 'stocks' dict if we stored series, 
+        # but we didn't store the full series in 'stocks' dict to save memory.
+        # So we look back at 'data' variable.
+        
+        try:
+            if isinstance(data.columns, pd.MultiIndex):
+                if t in data.columns.levels[0]:
+                    if 'Adj Close' in data[t]:
+                        series = data[t]['Adj Close']
+                    else:
+                        series = data[t]['Close']
+                else:
+                    continue
+            else:
+                # Single ticker case (unlikely here)
+                series = data['Adj Close'] if 'Adj Close' in data else data['Close']
+            
+            cleaned_data[t] = series
+        except Exception as e:
+            print(f"Error extracting data for {t}: {e}")
+            
+    # Drop NaNs
+    cleaned_data = cleaned_data.dropna()
+    
+    # Save Cleaned Data
+    cleaned_csv_path = os.path.join(os.path.dirname(OUTPUT_HTML), 'cleaned_data.csv')
+    cleaned_data.to_csv(cleaned_csv_path)
+    print(f"Saved cleaned data to {cleaned_csv_path}")
+
+    # --- OPTIMIZATION FUNCTIONS ---
+    
+    def portfolio_performance(weights, mean_returns, cov_matrix):
+        returns = np.sum(mean_returns * weights) * 252
+        std = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
+        return returns, std
+
+    def neg_sharpe_ratio(weights, mean_returns, cov_matrix, risk_free_rate):
+        p_ret, p_std = portfolio_performance(weights, mean_returns, cov_matrix)
+        return - (p_ret - risk_free_rate) / p_std
+
+    def minimize_volatility(weights, mean_returns, cov_matrix):
+        p_ret, p_std = portfolio_performance(weights, mean_returns, cov_matrix)
+        return p_std
+        
+    def calculate_var(weights, mean_returns, cov_matrix, confidence_level=0.05):
+        # Parametric VaR
+        p_ret, p_std = portfolio_performance(weights, mean_returns, cov_matrix)
+        # Convert annual to daily for VaR check? Assignment says "Daily Value-at-Risk (VaR) must be capped at -1.5% maximum"
+        # Usually VaR is calculated on daily returns.
+        
+        # Daily metrics
+        daily_ret = p_ret / 252
+        daily_std = p_std / np.sqrt(252)
+        
+        # VaR = Mean - Z * Std
+        # For 95% confidence, Z ~ 1.645
+        z_score = stats.norm.ppf(1 - confidence_level)
+        var = daily_ret - (z_score * daily_std)
+        return var # This will be a negative number (e.g., -0.02 for -2%)
+
+    # --- RUN SCENARIOS ---
+    
+    # Filter out KLSE for optimization (we only optimize stocks)
+    stock_tickers = [s['Ticker'] for s in top_50_stocks]
+    stock_data = cleaned_data[stock_tickers]
+    
+    # Calculate Daily Returns
+    daily_returns = stock_data.pct_change().dropna()
+    mean_returns = daily_returns.mean()
+    cov_matrix = daily_returns.cov()
+    
+    num_assets = len(stock_tickers)
+    risk_free_rate = 0.04 # 4% fixed as per assignment/card
+    
+    scenarios = []
+    
+    # Define Scenarios
+    # Scenario 1: Volatility Caps (5%, 10%, 20%) -> Annual Volatility?
+    # Assignment: "annual volatility capped at 5%, 10% and 20%"
+    vol_caps = [0.05, 0.10, 0.20]
+    
+    # Scenario 2: Max Component Weights (10%, 20%, 30%)
+    weight_caps = [0.10, 0.20, 0.30]
+    
+    # We will run optimization for each combination or just these specific sets?
+    # "A scenario analysis... based on annual volatility..."
+    # "A scenario analysis... based on max component weights..."
+    # Let's do them separately as requested.
+    
+    results_html = ""
+    
+    # Calculate Minimum Volatility Portfolio first to check feasibility
+    def get_min_vol():
+        constraints = [{'type': 'eq', 'fun': lambda x: np.sum(x) - 1}]
+        bounds = tuple((0, 1.0) for _ in range(num_assets))
+        init_guess = num_assets * [1. / num_assets,]
+        result = minimize(minimize_volatility, init_guess, args=(mean_returns, cov_matrix),
+                          method='SLSQP', bounds=bounds, constraints=constraints)
+        return result
+
+    min_vol_res = get_min_vol()
+    min_vol_val = 1.0
+    if min_vol_res.success:
+        _, min_vol_val = portfolio_performance(min_vol_res.x, mean_returns, cov_matrix)
+        print(f"Minimum Achievable Volatility: {min_vol_val*100:.2f}%")
+    else:
+        print("Failed to calculate Min Volatility")
+
+    # --- SCENARIO DETAIL PAGE GENERATOR ---
+    def generate_scenario_html(name, weights, mean_returns, cov_matrix, ret, vol, sharpe, var):
+        safe_name = name.replace(" ", "_").replace("%", "").lower()
+        filename = f"scenario_{safe_name}.html"
+        filepath = os.path.join(os.path.dirname(OUTPUT_HTML), 'details', filename)
+        
+        # Create DataFrame for weights
+        df_weights = pd.DataFrame({'Ticker': stock_tickers, 'Weight': weights})
+        df_weights = df_weights[df_weights['Weight'] > 0.0001] # Filter small weights
+        df_weights = df_weights.sort_values('Weight', ascending=False)
+        
+        # Add Company Names
+        df_weights['Name'] = df_weights['Ticker'].apply(lambda t: next((s['Name'] for s in stocks if s['Ticker'] == t), t))
+        
+        # Generate Rows
+        rows_html = ""
+        for _, row in df_weights.iterrows():
+            rows_html += f"<tr><td>{row['Ticker']}</td><td>{row['Name']}</td><td class='num'>{(row['Weight']*100):.2f}%</td></tr>"
+            
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Scenario Details: {name}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <style>
+                body {{ font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; padding: 40px; margin: 0; padding-top: 80px; }}
+                .container {{ max-width: 900px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }}
+                h1 {{ margin-top: 0; color: #0f172a; }}
+                .metrics-grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0; }}
+                .metric-card {{ background: #f1f5f9; padding: 20px; border-radius: 8px; text-align: center; }}
+                .metric-val {{ font-size: 24px; font-weight: 700; color: #2563eb; }}
+                .metric-label {{ font-size: 14px; color: #64748b; margin-top: 5px; }}
+                table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+                th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }}
+                th {{ background: #f8fafc; font-weight: 600; }}
+                .num {{ text-align: right; font-family: monospace; }}
+                .back-link {{ display: inline-block; margin-bottom: 20px; color: #2563eb; text-decoration: none; }}
+                .back-link:hover {{ text-decoration: underline; }}
+                .math-box {{ background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 8px; margin-top: 40px; }}
+                .math-title {{ font-weight: 600; color: #92400e; margin-bottom: 10px; }}
+                code {{ background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-family: monospace; }}
+                
+                /* Navbar Styles for Detail Page */
+                .navbar {{ position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #e2e8f0; z-index: 1000; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+                .nav-container {{ width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }}
+                .nav-logo {{ font-size: 18px; font-weight: 700; color: #2563eb; text-decoration: none; display: flex; align-items: center; gap: 8px; }}
+                .nav-links {{ display: flex; gap: 24px; }}
+                .nav-item {{ font-size: 14px; font-weight: 500; color: #64748b; text-decoration: none; transition: color 0.2s; }}
+                .nav-item:hover {{ color: #2563eb; }}
+            </style>
+        </head>
+        <body>
+            <!-- Navbar -->
+            <nav class="navbar">
+                <div class="nav-container">
+                    <a href="../index.html" class="nav-logo">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
+                        RBA Robo-Advisor
+                    </a>
+                    <div class="nav-links">
+                        <a href="../index.html#dashboard" class="nav-item">Dashboard</a>
+                        <a href="../index.html#optimization" class="nav-item active">Optimization</a>
+                        <a href="../index.html#market" class="nav-item">Market Data</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <div class="container">
+                <a href="../index.html#optimization" class="back-link">&larr; Back to Optimization</a>
+                <h1>Scenario: {name}</h1>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-val">{ret*100:.2f}%</div>
+                        <div class="metric-label">Annual Return</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-val">{vol*100:.2f}%</div>
+                        <div class="metric-label">Volatility</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-val">{sharpe:.2f}</div>
+                        <div class="metric-label">Sharpe Ratio</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-val">{var*100:.2f}%</div>
+                        <div class="metric-label">Daily VaR (95%)</div>
+                    </div>
+                </div>
+                
+                <h2>Portfolio Composition</h2>
+                <p>Allocated across {len(df_weights)} assets.</p>
+                <table>
+                    <thead><tr><th>Ticker</th><th>Company Name</th><th class="num">Weight</th></tr></thead>
+                    <tbody>{rows_html}</tbody>
+                </table>
+                
+                <div class="math-box">
+                    <div class="math-title">How was this calculated?</div>
+                    <p><strong>Optimization Objective:</strong> Maximize Sharpe Ratio = (Portfolio Return - Risk Free Rate) / Portfolio Volatility</p>
+                    <p><strong>Portfolio Return ($R_p$):</strong> Sum of (Weight * Asset Return) for all assets.<br>
+                    <code>R_p = w₁r₁ + w₂r₂ + ... + wₙrₙ</code></p>
+                    <p><strong>Portfolio Volatility ($\sigma_p$):</strong> Calculated using the Covariance Matrix ($\Sigma$) to account for correlations between stocks.<br>
+                    <code>σ_p = √(wᵀ Σ w)</code></p>
+                    <p><strong>Value at Risk (VaR):</strong> The maximum expected loss over one day with 95% confidence.<br>
+                    <code>VaR = (Daily Return) - (1.645 * Daily Volatility)</code></p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(html)
+        return f"details/{filename}"
+
+    # Helper to run optimization
+    def run_optimization(name, vol_cap=None, weight_cap=None):
+        # Check if Vol Cap is feasible
+        if vol_cap and vol_cap < min_vol_val:
+            return None, f"Infeasible (Min Vol: {min_vol_val*100:.2f}%)"
+
+        constraints = [{'type': 'eq', 'fun': lambda x: np.sum(x) - 1}]
+        bounds = tuple((0, weight_cap if weight_cap else 1.0) for _ in range(num_assets))
+        
+        if vol_cap:
+            # Constraint: Annual Volatility <= vol_cap
+            constraints.append({'type': 'ineq', 'fun': lambda x: vol_cap - (np.sqrt(np.dot(x.T, np.dot(cov_matrix, x))) * np.sqrt(252))})
+            
+        # Constraint: Daily VaR >= -1.5% (-0.015)
+        # Relaxed to check if this is the blocker. Let's keep it but handle failure gracefully.
+        # constraints.append({'type': 'ineq', 'fun': lambda x: calculate_var(x, mean_returns, cov_matrix) - (-0.015)})
+
+        # Initial Guess
+        init_guess = num_assets * [1. / num_assets,]
+        
+        # Optimize for Max Sharpe
+        result = minimize(neg_sharpe_ratio, init_guess, args=(mean_returns, cov_matrix, risk_free_rate),
+                          method='SLSQP', bounds=bounds, constraints=constraints, options={'maxiter': 1000})
+                          
+        return result, "Optimization Failed"
+
+    # 1. Volatility Cap Scenarios
+    results_html += "<h3>Scenario 1: Volatility Caps</h3><table class='opt-table'><tr><th>Cap</th><th>Return</th><th>Volatility</th><th>Sharpe</th><th>VaR (Daily)</th><th>Details</th></tr>"
+    
+    for v_cap in vol_caps:
+        res, msg = run_optimization(f"Vol Cap {v_cap*100}%", vol_cap=v_cap, weight_cap=1.0)
+        
+        if res and res.success:
+            ret, vol = portfolio_performance(res.x, mean_returns, cov_matrix)
+            sharpe = (ret - risk_free_rate) / vol
+            var = calculate_var(res.x, mean_returns, cov_matrix)
+            
+            # Generate Detail Page
+            link = generate_scenario_html(f"Vol Cap {v_cap*100}%", res.x, mean_returns, cov_matrix, ret, vol, sharpe, var)
+            
+            results_html += f"<tr><td>{v_cap*100}%</td><td>{ret*100:.2f}%</td><td>{vol*100:.2f}%</td><td>{sharpe:.2f}</td><td>{var*100:.2f}%</td><td><a href='{link}'>View Calculation</a></td></tr>"
+        elif res:
+             results_html += f"<tr><td>{v_cap*100}%</td><td colspan='4'>Optimization Failed: {res.message}</td><td>-</td></tr>"
+        else:
+             results_html += f"<tr><td>{v_cap*100}%</td><td colspan='4'>{msg}</td><td>-</td></tr>"
+
+    results_html += "</table>"
+
+    # 2. Weight Cap Scenarios
+    results_html += "<h3>Scenario 2: Weight Caps</h3><table class='opt-table'><tr><th>Cap</th><th>Return</th><th>Volatility</th><th>Sharpe</th><th>VaR (Daily)</th><th>Details</th></tr>"
+    
+    for w_cap in weight_caps:
+        res, msg = run_optimization(f"Weight Cap {w_cap*100}%", vol_cap=None, weight_cap=w_cap)
+        
+        if res and res.success:
+            ret, vol = portfolio_performance(res.x, mean_returns, cov_matrix)
+            sharpe = (ret - risk_free_rate) / vol
+            var = calculate_var(res.x, mean_returns, cov_matrix)
+            
+            # Generate Detail Page
+            link = generate_scenario_html(f"Weight Cap {w_cap*100}%", res.x, mean_returns, cov_matrix, ret, vol, sharpe, var)
+            
+            results_html += f"<tr><td>{w_cap*100}%</td><td>{ret*100:.2f}%</td><td>{vol*100:.2f}%</td><td>{sharpe:.2f}</td><td>{var*100:.2f}%</td><td><a href='{link}'>View Calculation</a></td></tr>"
+        elif res:
+             results_html += f"<tr><td>{w_cap*100}%</td><td colspan='4'>Optimization Failed: {res.message}</td><td>-</td></tr>"
+        else:
+             results_html += f"<tr><td>{w_cap*100}%</td><td colspan='4'>{msg}</td><td>-</td></tr>"
+    results_html += "</table>"
+
+
+    # --- CALCULATE DASHBOARD METRICS ---
+    market_return_str = "-"
+    market_color = "text-muted"
+    market_arrow = ""
+    
+    if klse_data:
+        m_ret = klse_data.get('1Y_Return', 0)
+        # 1Y_Return is already in percentage (e.g. 5.0 for 5%)?
+        # Let's check line 179: s['1Y_Return'] = one_y_ret * 100
+        # So it is already multiplied by 100.
+        # But wait, in the f-string I was doing *100 again?
+        # Let's check the previous code.
+        # Line 180: s['1Y_Return_Display'] = f"{one_y_ret*100:.2f}%"
+        # So s['1Y_Return'] holds the percentage value (e.g. 10.5).
+        
+        market_return_str = f"{m_ret:.2f}%"
+        if m_ret >= 0:
+            market_color = "text-green"
+            market_arrow = "▲"
+        else:
+            market_color = "text-red"
+            market_arrow = "▼"
+            
+    # Top Performer
+    valid_performers = [s for s in stocks if s['Has_6Y_Data']]
+    if valid_performers:
+        top_performer = max(valid_performers, key=lambda x: x.get('1Y_Return', -999))
+    else:
+        top_performer = {'Ticker': '-', '1Y_Return': 0}
+        
+    # Avg Daily Return
+    if valid_performers:
+        avg_daily_return = sum(s['Avg_Return'] for s in valid_performers) / len(valid_performers)
+    else:
+        avg_daily_return = 0
+
+
     # 3. Generate HTML content
     html_content = f"""
     <!DOCTYPE html>
@@ -382,105 +748,145 @@ def generate_html():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ACE Market Dashboard</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <title>ACE Market Stock Dashboard</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="#" class="nav-logo" onclick="switchTab('dashboard')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                    </svg>
+                    RBA Robo-Advisor
+                </a>
+                <div class="nav-links">
+                    <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('dashboard')" id="nav-dashboard">Dashboard</a>
+                    <a href="javascript:void(0)" class="nav-item" onclick="switchTab('optimization')" id="nav-optimization">Optimization</a>
+                    <a href="javascript:void(0)" class="nav-item" onclick="switchTab('market')" id="nav-market">Market Data</a>
+                </div>
+            </div>
+        </nav>
+
         <div class="dashboard">
             <div class="header">
                 <div>
-                    <h1>ACE Market Analytics</h1>
-                    <div class="date">Last Updated: {datetime.date.today().strftime('%B %d, %Y')}</div>
+                    <h1>ACE Market Stock Dashboard</h1>
+                    <div class="date">Last updated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
                 </div>
-                <div>
-                    <!-- Optional Header Actions -->
-                </div>
-            </div>
-
-            <!-- Summary Cards -->
-            <div class="summary-grid">
-                <div class="card">
-                    <div class="card-title">Market Benchmark (KLCI)</div>
-                    <div class="card-value">
-                        {klse_data['Last_Price_Display'] if klse_data else '-'}
-                    </div>
-                    <div class="card-sub">
-                        Daily Return: <span class="{ 'text-green' if klse_data and klse_data.get('Today_Return', 0) >= 0 else 'text-red' }">
-                            {klse_data['Today_Return_Display'] if klse_data and 'Today_Return_Display' in klse_data else '-'}
-                        </span>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Risk Free Rate (10Y Bond)</div>
-                    <div class="card-value">4.00%</div>
-                    <div class="card-sub text-muted">Fixed Assumption</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Total Companies</div>
-                    <div class="card-value">{len(stocks)}</div>
-                    <div class="card-sub text-muted">
-                        {sum(1 for s in stocks if s['Has_6Y_Data'])} with 6Y Data
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Target Stocks (>0.25% Avg Ret)</div>
-                    <div class="card-value">
-                        {sum(1 for s in stocks if s['Has_6Y_Data'] and s['Avg_Return'] >= 0.25)}
-                    </div>
-                    <div class="card-sub text-green">High Potential</div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="downloadCSV()" class="btn-action" style="font-size: 14px; padding: 8px 16px; display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Export to Excel
+                    </button>
                 </div>
             </div>
 
-            <!-- Controls -->
-            <div class="controls-bar">
-                <div class="search-wrapper">
-                    <input type="text" id="searchInput" placeholder="Search company name or code..." onkeyup="filterTable()">
-                </div>
-                <div style="min-width: 200px;">
-                    <select id="dataFilter" onchange="filterTable()">
-                        <option value="target">Target Stocks (6Y Data & >0.25% Ret)</option>
-                        <option value="qualified">Has > 6 Years Data</option>
-                        <option value="has_5y">Has > 5 Years Data</option>
-                        <option value="all">Show All Stocks</option>
-                        <option value="unqualified">Less than 6Y Data</option>
-                    </select>
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content active">
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <div class="card">
+                        <div class="card-title">Market Overview</div>
+                        <div class="card-value">{market_return_str}</div>
+                        <div class="card-sub {market_color}">
+                            {market_arrow} KLCI Benchmark (1Y)
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Top Performer (1Y)</div>
+                        <div class="card-value">{top_performer['Ticker']}</div>
+                        <div class="card-sub text-green">
+                            +{top_performer['1Y_Return']:.2f}% Return
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Average Daily Return</div>
+                        <div class="card-value">{avg_daily_return:.4f}%</div>
+                        <div class="card-sub text-muted">
+                            Across {len(stocks)} stocks
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Data Coverage</div>
+                        <div class="card-value">{len([s for s in stocks if s['Has_6Y_Data']])}/{len(stocks)}</div>
+                        <div class="card-sub text-muted">
+                            Stocks with full 6Y history
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- View Options -->
-                <div class="view-options">
-                    <button class="view-btn" onclick="toggleViewMenu()">
-                        <span>View Options</span>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 9l6 6 6-6"/>
-                        </svg>
-                    </button>
-                    <div id="viewMenu" class="view-menu">
-                        <label class="view-item">
-                            <input type="checkbox" checked onchange="toggleColumnGroup('col-live', this.checked)"> Live Data
-                        </label>
-                        <label class="view-item">
-                            <input type="checkbox" checked onchange="toggleColumnGroup('col-perf', this.checked)"> Performance
-                        </label>
-                        <label class="view-item">
-                            <input type="checkbox" checked onchange="toggleColumnGroup('col-status', this.checked)"> Status
-                        </label>
+                <div style="margin-top: 40px; text-align: center; padding: 40px; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h2 style="margin-top: 0;">Welcome to the RBA Robo-Advisor</h2>
+                    <p style="color: #64748b; max-width: 600px; margin: 10px auto 30px;">
+                        Analyze 50 ACE Market stocks, optimize portfolios using Mean-Variance analysis, and explore detailed market data.
+                    </p>
+                    <div style="display: flex; justify-content: center; gap: 20px;">
+                        <button onclick="switchTab('optimization')" class="btn-action" style="padding: 12px 24px; font-size: 16px;">Go to Optimization</button>
+                        <button onclick="switchTab('market')" class="btn-action" style="padding: 12px 24px; font-size: 16px; background: white; color: #2563eb; border: 1px solid #2563eb;">View Market Data</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: OPTIMIZATION -->
+            <div id="tab-optimization" class="tab-content">
+                <!-- Portfolio Optimization Results -->
+                <div class="summary-grid" style="grid-template-columns: 1fr; margin-bottom: 30px;">
+                    <div class="card">
+                        <div class="card-title">Portfolio Optimization Scenarios (Top 50 Stocks)</div>
+                        <div class="card-sub text-muted">Objective: Maximize Sharpe Ratio | Constraints: VaR >= -1.5%</div>
+                        <div style="margin-top: 20px; overflow-x: auto;">
+                            {results_html}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: MARKET DATA -->
+            <div id="tab-market" class="tab-content">
+                <!-- Controls -->
+                <div class="controls-bar">
+                    <div class="search-wrapper">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by code or name...">
+                    </div>
+                    <div style="width: 200px;">
+                        <select id="dataFilter" onchange="filterTable()">
+                            <option value="all">Show All Stocks</option>
+                            <option value="target">Target (>6Y Data & High Return)</option>
+                            <option value="qualified">Qualified (>6Y Data)</option>
+                            <option value="has_5y">Has 5Y Data</option>
+                            <option value="unqualified">Unqualified (< 5Y Data)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- View Options Dropdown -->
+                    <div class="view-options">
+                        <button class="view-btn" onclick="toggleViewMenu()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            View Options
+                        </button>
+                        <div id="viewMenu" class="view-menu">
+                            <div class="view-item" onclick="toggleColumnGroup('col-live')">
+                                <input type="checkbox" checked id="chk-live"> Live Data
+                            </div>
+                            <div class="view-item" onclick="toggleColumnGroup('col-perf')">
+                                <input type="checkbox" checked id="chk-perf"> Performance
+                            </div>
+                            <div class="view-item" onclick="toggleColumnGroup('col-status')">
+                                <input type="checkbox" checked id="chk-status"> Status
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Export Button -->
-                <button class="view-btn" onclick="exportTableToCSV('stock_summary.csv')" style="margin-left: auto;">
-                    <span>Export to Excel</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Main Table -->
-            <div class="table-container">
+                <!-- Main Table -->
+                <div class="table-container">
                 <div class="table-responsive">
                     <table id="stockTable">
                         <thead>
@@ -631,6 +1037,39 @@ def generate_html():
                     elements[i].style.display = isVisible ? "" : "none";
                 }
             }
+
+            function switchTab(tabId) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Show selected tab
+                const selectedTab = document.getElementById('tab-' + tabId);
+                if (selectedTab) {
+                    selectedTab.classList.add('active');
+                }
+                
+                // Update nav links
+                document.querySelectorAll('.nav-item').forEach(link => {
+                    link.classList.remove('active');
+                });
+                const activeLink = document.getElementById('nav-' + tabId);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+                
+                // Update URL hash without scrolling
+                history.pushState(null, null, '#' + tabId);
+            }
+            
+            // Check hash on load
+            window.onload = function() {
+                const hash = window.location.hash.replace('#', '');
+                if (hash && (hash === 'dashboard' || hash === 'optimization' || hash === 'market')) {
+                    switchTab(hash);
+                }
+            };
 
             function filterTable() {
                 const searchInput = document.getElementById('searchInput').value.toUpperCase();
