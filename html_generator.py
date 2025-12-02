@@ -256,18 +256,19 @@ def generate_stock_detail_html(stock, market_metrics, history_series=None):
     history_html = ""
     if history_series is not None and not history_series.empty:
         # Serialize full history for JS
+        # Optimization: Use list of lists [date_str, price] to save space
         history_data = []
         # Sort descending by date
         sorted_history = history_series.sort_index(ascending=False)
         for date, price in sorted_history.items():
-            history_data.append({
-                'date': date.strftime('%Y-%m-%d'),
-                'year': date.year,
-                'price': float(price)
-            })
+            history_data.append([
+                date.strftime('%Y-%m-%d'),
+                round(float(price), 3)
+            ])
             
         import json
-        history_json = json.dumps(history_data)
+        # Minify JSON with separators
+        history_json = json.dumps(history_data, separators=(',', ':'))
         
         history_html = f"""
         <div class="metric-card" style="grid-column: span 2;">
@@ -302,8 +303,9 @@ def generate_stock_detail_html(stock, market_metrics, history_series=None):
                     const yearSelect = document.getElementById('yearFilter');
                     if (!priceHistory || priceHistory.length === 0) return;
                     
-                    // Extract unique years
-                    const years = [...new Set(priceHistory.map(item => item.year))];
+                    // Extract unique years from date string "YYYY-MM-DD"
+                    // item is [date, price]
+                    const years = [...new Set(priceHistory.map(item => parseInt(item[0].substring(0, 4))))];
                     
                     // Populate dropdown
                     yearSelect.innerHTML = '';
@@ -326,7 +328,8 @@ def generate_stock_detail_html(stock, market_metrics, history_series=None):
                     tbody.innerHTML = '';
                     
                     const selectedYear = parseInt(year);
-                    const filteredData = priceHistory.filter(item => item.year === selectedYear);
+                    // Filter: item[0] is date string
+                    const filteredData = priceHistory.filter(item => parseInt(item[0].substring(0, 4)) === selectedYear);
                     
                     if (filteredData.length === 0) {{
                         tbody.innerHTML = '<tr><td colspan="2" style="padding: 10px; text-align: center; color: #64748b;">No data for this year</td></tr>';
@@ -335,9 +338,10 @@ def generate_stock_detail_html(stock, market_metrics, history_series=None):
                     
                     filteredData.forEach(item => {{
                         const row = document.createElement('tr');
+                        // item[0] is date, item[1] is price
                         row.innerHTML = `
-                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${{item.date}}</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${{item.price.toFixed(3)}}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${{item[0]}}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${{item[1].toFixed(3)}}</td>
                         `;
                         tbody.appendChild(row);
                     }});
