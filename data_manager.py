@@ -282,7 +282,10 @@ def load_data_from_local_datasets(datasets_dir="datasets"):
             if not series.empty:
                 # Calculate Metrics
                 daily_returns = series.pct_change().dropna()
-                avg_daily_ret = daily_returns.mean()
+                
+                # STRICT REQUIREMENT: Use last 5 years (1260 days) for consistent display
+                recent_returns = daily_returns.tail(1260)
+                avg_daily_ret = recent_returns.mean()
                 std_dev = daily_returns.std()
                 last_price = series.iloc[-1]
                 

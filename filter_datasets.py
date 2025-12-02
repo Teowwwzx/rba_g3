@@ -107,7 +107,11 @@ def filter_market(market_name, companies_file, prices_file): # Removed output_pr
             
         # 2. Check Avg Daily Return > 0.25%
         daily_returns = series.pct_change().dropna()
-        avg_return = daily_returns.mean()
+        
+        # STRICT REQUIREMENT: "past five (5) years"
+        # We take the last 1260 trading days (5 * 252) to be fair and consistent
+        recent_returns = daily_returns.tail(1260)
+        avg_return = recent_returns.mean()
         
         if avg_return <= 0.0025:
             continue
