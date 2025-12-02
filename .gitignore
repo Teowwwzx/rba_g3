@@ -13,3 +13,6 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Datasets
+datasets/intermediate/

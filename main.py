@@ -14,17 +14,45 @@ def main():
     print("--- RBA Robo-Advisor Generator ---")
     
     # 1. Data Fetching
-    print("Step 1: Fetching Data...")
+    print("Step 1: Fetching Data from Local Datasets...")
     try:
-        stocks = data_manager.get_stock_list(HTML_FILE)
-        # For testing, we can limit stocks if needed, but let's do all
-        processed_stocks, klse_data = data_manager.download_and_process_data(stocks, '2018-01-01', '2024-12-31')
+        # Load Data from Local Datasets
+        # This returns processed_stocks (list of dicts) and klci_data (dict)
+        processed_stocks, klci_data = data_manager.load_data_from_local_datasets('datasets')
+        
+        # Load Bond Yield
+        # We use the processed bond dataset
+        bond_yield_series = data_manager.get_bond_yield_data('datasets/dataset_bond_yield.csv')
+        current_risk_free_rate = RISK_FREE_RATE
+        if bond_yield_series is not None and not bond_yield_series.empty:
+            current_risk_free_rate = bond_yield_series.iloc[-1]
+            print(f"Using latest Bond Yield as Risk-Free Rate: {current_risk_free_rate*100:.2f}%")
+        else:
+            print(f"Using default Risk-Free Rate: {current_risk_free_rate*100:.2f}%")
+
     except Exception as e:
         print(f"Error in data fetching: {e}")
         return
 
     # 2. Portfolio Optimization Prep
     print("Step 2: Preparing for Optimization...")
+    # We need to filter for stocks that have enough data for optimization (e.g. 6Y or just Qualified)
+    # Let's use Qualified stocks for optimization candidates if they have enough history
+    # Or stick to the original logic which used 'Has_6Y_Data'.
+    # data_manager.load_data_from_local_datasets calculates metrics but maybe not 'Has_6Y_Data' explicitly?
+    # Let's check data_manager.py again. It calculates metrics but didn't set 'Has_6Y_Data'.
+    # We should probably add 'Has_6Y_Data' logic in data_manager or here.
+    # For now, let's assume we use Qualified stocks for optimization or just top stocks by return.
+    
+    # Let's add Has_6Y_Data logic back if it's missing, or rely on what we have.
+    # Actually, let's just use the 'Qualified' stocks for optimization as they are the "good" ones.
+    
+    # Update 'Has_6Y_Data' for compatibility with prepare_optimization_data
+    for s in processed_stocks:
+        if 'Series' in s:
+            years = len(s['Series']) / 252.0
+            s['Has_6Y_Data'] = years >= 6.0
+            
     top_stocks, df_prices = data_manager.prepare_optimization_data(processed_stocks)
     print(f"Selected {len(top_stocks)} stocks for optimization.")
     
@@ -33,6 +61,11 @@ def main():
     mean_returns = daily_returns.mean()
     cov_matrix = daily_returns.cov()
     
+    # Calculate Market Breakdown in Top 50
+    ace_count = sum(1 for s in top_stocks if s.get('Market') == 'ACE')
+    main_count = sum(1 for s in top_stocks if s.get('Market') == 'Main')
+    breakdown_html = f"<div class='card-sub text-muted'>Selected 50 stocks: <strong>{ace_count} ACE</strong>, <strong>{main_count} Main</strong> Market</div>"
+
     # 3. Run Optimization Scenarios
     print("Step 3: Running Optimization Scenarios...")
     results_html = ""
@@ -47,12 +80,12 @@ def main():
         if v_cap < min_vol:
             results_html += f"<tr><td>{v_cap*100}%</td><td colspan='4'>Infeasible (Min Vol: {min_vol*100:.2f}%)</td><td>-</td></tr>"
         else:
-            res, msg = portfolio_optimizer.run_optimization(f"Vol Cap {v_cap*100}%", mean_returns, cov_matrix, RISK_FREE_RATE, vol_cap=v_cap)
+            res, msg = portfolio_optimizer.run_optimization(f"Vol Cap {v_cap*100}%", mean_returns, cov_matrix, current_risk_free_rate, vol_cap=v_cap)
             if res and res.success:
                 ret, vol = portfolio_optimizer.portfolio_performance(res.x, mean_returns, cov_matrix)
-                sharpe = (ret - RISK_FREE_RATE) / vol
+                sharpe = (ret - current_risk_free_rate) / vol
                 var = portfolio_optimizer.calculate_var(res.x, mean_returns, cov_matrix)
-                link = html_generator.generate_scenario_html(f"Vol Cap {v_cap*100}%", res.x, mean_returns, cov_matrix, ret, vol, sharpe, var, top_stocks[0]['Ticker'], processed_stocks) # Need tickers list
+                link = html_generator.generate_scenario_html(f"Vol Cap {v_cap*100}%", res.x, mean_returns, cov_matrix, ret, vol, sharpe, var, top_stocks[0]['Ticker'], processed_stocks)
                 results_html += f"<tr><td>{v_cap*100}%</td><td>{ret*100:.2f}%</td><td>{vol*100:.2f}%</td><td>{sharpe:.2f}</td><td>{var*100:.2f}%</td><td><a href='{link}'>View Calculation</a></td></tr>"
             else:
                 results_html += f"<tr><td>{v_cap*100}%</td><td colspan='4'>Failed: {msg}</td><td>-</td></tr>"
@@ -66,10 +99,10 @@ def main():
     tickers_list = [s['Ticker'] for s in top_stocks]
     
     for w_cap in weight_caps:
-        res, msg = portfolio_optimizer.run_optimization(f"Weight Cap {w_cap*100}%", mean_returns, cov_matrix, RISK_FREE_RATE, weight_cap=w_cap)
+        res, msg = portfolio_optimizer.run_optimization(f"Weight Cap {w_cap*100}%", mean_returns, cov_matrix, current_risk_free_rate, weight_cap=w_cap)
         if res and res.success:
             ret, vol = portfolio_optimizer.portfolio_performance(res.x, mean_returns, cov_matrix)
-            sharpe = (ret - RISK_FREE_RATE) / vol
+            sharpe = (ret - current_risk_free_rate) / vol
             var = portfolio_optimizer.calculate_var(res.x, mean_returns, cov_matrix)
             
             link = html_generator.generate_scenario_html(
@@ -94,8 +127,8 @@ def main():
     market_return_str = "-"
     market_color = "text-muted"
     market_arrow = ""
-    if klse_data:
-        m_ret = klse_data.get('1Y_Return', 0)
+    if klci_data:
+        m_ret = klci_data.get('1Y_Return', 0)
         market_return_str = f"{m_ret:.2f}%"
         if m_ret >= 0:
             market_color = "text-green"
@@ -105,6 +138,11 @@ def main():
             market_arrow = "▼"
             
     valid_performers = [s for s in processed_stocks if s.get('Has_6Y_Data')]
+    
+    # Calculate detailed coverage
+    ace_coverage = sum(1 for s in valid_performers if s.get('Market') == 'ACE')
+    main_coverage = sum(1 for s in valid_performers if s.get('Market') == 'Main')
+    
     if valid_performers:
         top_performer = max(valid_performers, key=lambda x: x.get('1Y_Return', -999))
         avg_daily = sum(s['Avg_Return'] for s in valid_performers) / len(valid_performers)
@@ -119,33 +157,25 @@ def main():
         'top_ticker': top_performer['Ticker'],
         'top_return': top_performer.get('1Y_Return', 0),
         'avg_daily': avg_daily,
-        'coverage': f"{len(valid_performers)}/{len(processed_stocks)}"
+        'coverage_count': f"{len(valid_performers)}/{len(processed_stocks)}",
+        'coverage_detail': f"({ace_coverage} ACE, {main_coverage} Main) with 6Y data"
     }
     
     # Generate Table Rows
     table_rows = ""
     for s in processed_stocks:
         # Determine status
-        # Target: >6Y Data AND Avg Daily Return >= 0.25% (0.0025)
-        is_target = s.get('Has_6Y_Data', False) and s.get('Avg_Return', 0) >= 0.0025
-        is_qualified = s.get('Has_6Y_Data', False)
-        has_5y = True # Simplified for now
+        # Qualified: Determined by data_manager based on cleaned datasets
+        is_qualified = s.get('Qualified', False)
         
         status_class = "status-unqualified"
         status_text = "Unqualified"
-        if is_target:
-            status_class = "status-target"
-            status_text = "Target"
-        elif is_qualified:
+        if is_qualified:
             status_class = "status-qualified"
             status_text = "Qualified"
             
         # Color for changes
-        # Use text-green / text-red from style.css
         last_price = s.get('Last_Price', 0)
-        # We don't have 'Change' or 'Today_Return' calculated in data_manager yet, 
-        # but let's assume if we did, or just use 1Y Return for color demo if needed.
-        # For now, let's color 1Y Return and Avg Daily Return.
         
         avg_ret = s.get('Avg_Return', 0)
         avg_ret_class = "text-green" if avg_ret >= 0 else "text-red"
@@ -158,24 +188,32 @@ def main():
             one_y_ret_str = "-"
             one_y_ret_class = ""
         
+        market_type = s.get('Market', 'ACE')
+        badge_class = 'badge-ace' if market_type == 'ACE' else 'badge-main'
+        market_badge = f"<span class='badge-market {badge_class}'>{market_type}</span>"
+        
+        # Generate Detail Page
+        html_generator.generate_stock_detail_html(s, market_metrics, s.get('Series'))
+        
         row = f"""
-        <tr data-target="{str(is_target).lower()}" data-qualified="{str(is_qualified).lower()}" data-has5y="true">
+        <tr data-qualified="{str(is_qualified).lower()}">
             <td>{s['Code']}</td>
             <td>{s['Name']}</td>
+            <td>{market_badge}</td>
             <td class="num col-live">{last_price:.3f}</td>
-            <td class="num col-live">-</td>
-            <td class="num col-live">-</td>
             <td class="num col-perf {avg_ret_class}">{avg_ret:.4f}</td>
             <td class="num col-perf">{s.get('Std_Dev', 0):.4f}</td>
             <td class="num col-perf {one_y_ret_class}">{one_y_ret_str}</td>
-            <td class="num col-perf">{(avg_ret*252 - 0.04)/(s.get('Std_Dev', 1)*np.sqrt(252)):.2f}</td>
+            <td class="num col-perf">{(avg_ret*252 - current_risk_free_rate)/(s.get('Std_Dev', 1)*np.sqrt(252)):.2f}</td>
             <td class="col-status"><span class="status-badge {status_class}">{status_text}</span></td>
-            <td class="col-status"><a href="https://finance.yahoo.com/quote/{s['Ticker']}" target="_blank">Yahoo</a></td>
+            <td class="col-status"><a href="details/{s['Code']}.html" target="_blank">Details</a></td>
         </tr>
         """
         table_rows += row
+    
+    final_results_html = breakdown_html + results_html
 
-    html_content = html_generator.generate_main_html(processed_stocks, market_metrics, results_html, table_rows)
+    html_content = html_generator.generate_main_html(processed_stocks, market_metrics, final_results_html, table_rows)
     
     with open(OUTPUT_HTML, 'w', encoding='utf-8') as f:
         f.write(html_content)

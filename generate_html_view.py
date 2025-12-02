@@ -200,9 +200,11 @@ def generate_html():
                             # Relative link for HTML
                             s['Detail_Link'] = "details/KLSE.html"
                         else:
-                            detail_filename = os.path.join(details_dir, f"{s['Code']}.html")
+                            # Ensure 4-digit code for filename
+                            code_str = str(s['Code']).zfill(4)
+                            detail_filename = os.path.join(details_dir, f"{code_str}.html")
                             # Relative link for HTML
-                            s['Detail_Link'] = f"details/{s['Code']}.html"
+                            s['Detail_Link'] = f"details/{code_str}.html"
                         
                         # Create DataFrame for display
                         df_detail = pd.DataFrame({

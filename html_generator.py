@@ -17,7 +17,6 @@ def generate_navbar(active_tab='dashboard'):
                 <a href="javascript:void(0)" class="nav-item {'active' if active_tab=='dashboard' else ''}" onclick="switchTab('dashboard')" id="nav-dashboard">Dashboard</a>
                 <a href="javascript:void(0)" class="nav-item {'active' if active_tab=='guide' else ''}" onclick="switchTab('guide')" id="nav-guide">Learning Guide</a>
                 <a href="javascript:void(0)" class="nav-item {'active' if active_tab=='optimization' else ''}" onclick="switchTab('optimization')" id="nav-optimization">Optimization</a>
-                <a href="javascript:void(0)" class="nav-item {'active' if active_tab=='market' else ''}" onclick="switchTab('market')" id="nav-market">Market Data</a>
             </div>
         </div>
     </nav>
@@ -149,6 +148,13 @@ def generate_scenario_html(name, weights, mean_returns, cov_matrix, ret, vol, sh
             .nav-item {{ font-size: 14px; font-weight: 500; color: #64748b; text-decoration: none; transition: color 0.2s; }}
             .nav-item:hover {{ color: #2563eb; }}
             .nav-item.active {{ color: #2563eb; font-weight: 600; }}
+            /* Market Badges */
+            .badge-market {{ padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }}
+            .badge-ace {{ background: #dcfce7; color: #166534; }} /* Green/Teal */
+            .badge-main {{ background: #dbeafe; color: #1e40af; }} /* Blue/Indigo */
+            
+            .clickable-card {{ cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }}
+            .clickable-card:hover {{ transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }}
         </style>
     </head>
     <body>
@@ -226,6 +232,236 @@ def generate_scenario_html(name, weights, mean_returns, cov_matrix, ret, vol, sh
         
     return f"details/{filename}"
 
+def generate_stock_detail_html(stock, market_metrics, history_series=None):
+    """Generates a detail page for a single stock."""
+    code = stock['Code']
+    name = stock['Name']
+    ticker = stock['Ticker']
+    market = stock.get('Market', 'ACE')
+    
+    # Metrics
+    last_price = stock.get('Last_Price', 0)
+    
+    avg_ret = stock.get('Avg_Return')
+    if avg_ret is None: avg_ret = 0.0
+        
+    std_dev = stock.get('Std_Dev', 0)
+    
+    one_y_ret = stock.get('1Y_Return')
+    if one_y_ret is None: one_y_ret = 0.0
+    
+    navbar = generate_navbar(active_tab='dashboard')
+    
+    # Generate History Table
+    history_html = ""
+    if history_series is not None and not history_series.empty:
+        # Serialize full history for JS
+        history_data = []
+        # Sort descending by date
+        sorted_history = history_series.sort_index(ascending=False)
+        for date, price in sorted_history.items():
+            history_data.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'year': date.year,
+                'price': float(price)
+            })
+            
+        import json
+        history_json = json.dumps(history_data)
+        
+        history_html = f"""
+        <div class="metric-card" style="grid-column: span 2;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div class="metric-label">Price History</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label for="yearFilter" style="font-size: 13px; color: #64748b;">Filter by Year:</label>
+                    <select id="yearFilter" onchange="renderHistoryTable(this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px;">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+            </div>
+            
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead style="position: sticky; top: 0; background: white;">
+                        <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
+                            <th style="padding: 8px;">Date</th>
+                            <th style="padding: 8px;">Close Price (MYR)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Rows populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <script>
+                const priceHistory = {history_json};
+                
+                function initHistoryTable() {{
+                    const yearSelect = document.getElementById('yearFilter');
+                    if (!priceHistory || priceHistory.length === 0) return;
+                    
+                    // Extract unique years
+                    const years = [...new Set(priceHistory.map(item => item.year))];
+                    
+                    // Populate dropdown
+                    yearSelect.innerHTML = '';
+                    years.forEach(year => {{
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        yearSelect.appendChild(option);
+                    }});
+                    
+                    // Select latest year by default
+                    if (years.length > 0) {{
+                        yearSelect.value = years[0];
+                        renderHistoryTable(years[0]);
+                    }}
+                }}
+                
+                function renderHistoryTable(year) {{
+                    const tbody = document.getElementById('historyTableBody');
+                    tbody.innerHTML = '';
+                    
+                    const selectedYear = parseInt(year);
+                    const filteredData = priceHistory.filter(item => item.year === selectedYear);
+                    
+                    if (filteredData.length === 0) {{
+                        tbody.innerHTML = '<tr><td colspan="2" style="padding: 10px; text-align: center; color: #64748b;">No data for this year</td></tr>';
+                        return;
+                    }}
+                    
+                    filteredData.forEach(item => {{
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${{item.date}}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${{item.price.toFixed(3)}}</td>
+                        `;
+                        tbody.appendChild(row);
+                    }});
+                }}
+                
+                // Initialize on load
+                document.addEventListener('DOMContentLoaded', initHistoryTable);
+            </script>
+        </div>
+        """
+    else:
+        history_html = "<p>No historical data available.</p>"
+
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{name} ({code}) - Stock Details</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            body {{ font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; padding: 0; margin: 0; padding-top: 80px; }}
+            .container {{ max-width: 1000px; margin: 0 auto; padding: 40px 20px; }}
+            .header-section {{ background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }}
+            .stock-title {{ font-size: 28px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 15px; }}
+            .stock-meta {{ color: #64748b; margin-top: 10px; font-size: 14px; }}
+            .badge {{ padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }}
+            .badge-ace {{ background: #dcfce7; color: #166534; }}
+            .badge-main {{ background: #dbeafe; color: #1e40af; }}
+            
+            .metrics-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }}
+            .metric-card {{ background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }}
+            .metric-label {{ font-size: 13px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }}
+            .metric-value {{ font-size: 24px; font-weight: 700; color: #0f172a; margin-top: 5px; }}
+            .metric-sub {{ font-size: 12px; margin-top: 5px; }}
+            .text-green {{ color: #16a34a; }}
+            .text-red {{ color: #dc2626; }}
+            
+            .back-link {{ display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-weight: 500; margin-bottom: 20px; }}
+            .back-link:hover {{ color: #2563eb; }}
+            
+            /* Navbar Styles (Copied for consistency) */
+            .navbar {{ position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #e2e8f0; z-index: 1000; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+            .nav-container {{ width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }}
+            .nav-logo {{ font-size: 18px; font-weight: 700; color: #2563eb; text-decoration: none; display: flex; align-items: center; gap: 8px; }}
+            .nav-links {{ display: flex; gap: 24px; }}
+            .nav-item {{ font-size: 14px; font-weight: 500; color: #64748b; text-decoration: none; transition: color 0.2s; }}
+            .nav-item:hover {{ color: #2563eb; }}
+        </style>
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="../index.html" class="nav-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                    </svg>
+                    RBA Robo-Advisor
+                </a>
+                <div class="nav-links">
+                    <a href="../index.html#dashboard" class="nav-item">Dashboard</a>
+                    <a href="../index.html#guide" class="nav-item">Learning Guide</a>
+                    <a href="../index.html#optimization" class="nav-item">Optimization</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <a href="../index.html#dashboard" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                Back to Dashboard
+            </a>
+            
+            <div class="header-section">
+                <div class="stock-title">
+                    {name} ({code})
+                    <span class="badge {'badge-ace' if market == 'ACE' else 'badge-main'}">{market} Market</span>
+                </div>
+                <div class="stock-meta">Ticker: {ticker} | Currency: MYR</div>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Last Price</div>
+                    <div class="metric-value">{last_price:.3f}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Avg Daily Return</div>
+                    <div class="metric-value { 'text-green' if avg_ret >= 0 else 'text-red' }">{avg_ret*100:.4f}%</div>
+                    <div class="metric-sub text-muted">Historical Average</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Volatility (Std Dev)</div>
+                    <div class="metric-value">{std_dev:.4f}</div>
+                    <div class="metric-sub text-muted">Daily Risk</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">1Y Return</div>
+                    <div class="metric-value { 'text-green' if one_y_ret >= 0 else 'text-red' }">{one_y_ret:.2f}%</div>
+                    <div class="metric-sub text-muted">Past 12 Months</div>
+                </div>
+            </div>
+            
+            <div class="metrics-grid">
+                {history_html}
+            </div>
+            
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Save file
+    filename = f"{code}.html"
+    filepath = os.path.join("details", filename)
+    if not os.path.exists("details"):
+        os.makedirs("details")
+        
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(html)
+        
+    return f"details/{filename}"
+
 def generate_main_html(stocks, market_metrics, optimization_results, table_rows):
     """Generates the main dashboard HTML."""
     
@@ -238,9 +474,26 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ACE Market Stock Dashboard</title>
+        <title>Bursa Malaysia Stock Dashboard</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
+        <style>
+            /* Market Badges */
+            .badge-market {{ padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }}
+            .badge-ace {{ background: #dcfce7; color: #166534; }} /* Green/Teal */
+            .badge-main {{ background: #dbeafe; color: #1e40af; }} /* Blue/Indigo */
+            
+            .clickable-card {{ cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }}
+            .clickable-card:hover {{ transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }}
+            
+            /* Tooltips */
+            .tooltip {{ position: relative; display: inline-block; cursor: help; margin-left: 5px; vertical-align: middle; }}
+            .tooltip .tooltip-text {{ visibility: hidden; width: 280px; background-color: #1e293b; color: #fff; text-align: left; border-radius: 8px; padding: 12px; position: absolute; z-index: 10; bottom: 135%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 12px; font-weight: 400; line-height: 1.5; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); pointer-events: none; }}
+            .tooltip .tooltip-text::after {{ content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1e293b transparent transparent transparent; }}
+            .tooltip:hover .tooltip-text {{ visibility: visible; opacity: 1; }}
+            .tooltip-icon {{ display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: #94a3b8; color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; }}
+            .tooltip:hover .tooltip-icon {{ background: #64748b; }}
+        </style>
     </head>
     <body>
         {navbar}
@@ -248,7 +501,7 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
         <div class="dashboard">
             <div class="header">
                 <div>
-                    <h1>ACE Market Stock Dashboard</h1>
+                    <h1>Bursa Malaysia Stock Dashboard</h1>
                     <div class="date">Last updated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
                 </div>
                 <div style="display: flex; gap: 10px;">
@@ -265,11 +518,11 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
             <div id="tab-dashboard" class="tab-content active">
                 <!-- Summary Cards -->
                 <div class="summary-grid">
-                    <div class="card">
-                        <div class="card-title">Market Overview</div>
+                    <div class="card clickable-card" onclick="window.open('https://finance.yahoo.com/quote/%5EKLSE', '_blank')">
+                        <div class="card-title">Market Overview (KLCI) ↗</div>
                         <div class="card-value">{market_metrics['return_str']}</div>
                         <div class="card-sub {market_metrics['color']}">
-                            {market_metrics['arrow']} KLCI Benchmark (1Y)
+                            {market_metrics['arrow']} Benchmark (1Y)
                         </div>
                     </div>
                     <div class="card">
@@ -288,9 +541,9 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
                     </div>
                     <div class="card">
                         <div class="card-title">Data Coverage</div>
-                        <div class="card-value">{market_metrics['coverage']}</div>
+                        <div class="card-value">{market_metrics['coverage_count']}</div>
                         <div class="card-sub text-muted">
-                            Stocks with full 6Y history
+                            {market_metrics['coverage_detail']}
                         </div>
                     </div>
                 </div>
@@ -298,11 +551,115 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
                 <div style="margin-top: 40px; text-align: center; padding: 40px; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <h2 style="margin-top: 0;">Welcome to the RBA Robo-Advisor</h2>
                     <p style="color: #64748b; max-width: 600px; margin: 10px auto 30px;">
-                        Analyze 50 ACE Market stocks, optimize portfolios using Mean-Variance analysis, and explore detailed market data.
+                        Analyze Bursa Malaysia stocks (ACE & Main Market), optimize portfolios using Mean-Variance analysis, and explore detailed market data.
                     </p>
                     <div style="display: flex; justify-content: center; gap: 20px;">
                         <button onclick="switchTab('guide')" class="btn-action" style="padding: 12px 24px; font-size: 16px; background: #fffbeb; color: #92400e; border: 1px solid #fcd34d;">Start Learning Guide</button>
                         <button onclick="switchTab('optimization')" class="btn-action" style="padding: 12px 24px; font-size: 16px;">Go to Optimization</button>
+                    </div>
+                </div>
+
+                <!-- MARKET DATA SECTION (Merged) -->
+                <div style="margin-top: 40px;">
+                    <h2 style="margin-bottom: 20px;">Market Data & Screening</h2>
+                    <!-- Controls -->
+                    <div class="controls-bar">
+                        <div class="search-wrapper">
+                            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by code or name...">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="width: 180px;">
+                                <select id="marketFilter" onchange="filterTable()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                    <option value="all">All Markets</option>
+                                    <option value="ace">ACE Market</option>
+                                    <option value="main">Main Market</option>
+                                </select>
+                            </div>
+                            <div style="width: 220px;">
+                                    <select id="dataFilter" onchange="filterTable()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                    <option value="all">All</option>
+                                    <option value="qualified">Qualified (5 Year + >0.25% Daily Return)</option>
+                                    <option value="unqualified">Unqualified</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="view-options">
+                            <button class="view-btn" onclick="toggleViewMenu()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                View Options
+                            </button>
+                            <div id="viewMenu" class="view-menu">
+                                <div class="view-item" onclick="toggleColumnGroup('col-live')">
+                                    <input type="checkbox" checked id="chk-live"> Live Data
+                                </div>
+                                <div class="view-item" onclick="toggleColumnGroup('col-perf')">
+                                    <input type="checkbox" checked id="chk-perf"> Performance
+                                </div>
+                                <div class="view-item" onclick="toggleColumnGroup('col-status')">
+                                    <input type="checkbox" checked id="chk-status"> Status
+                                </div>
+                            </div>
+                        </div>
+                        <span id="resultCount" style="margin-left: auto; font-size: 14px; color: #64748b;"></span>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table id="stockTable">
+                                <thead>
+                                    <tr style="background: #f8fafc; border-bottom: 1px solid var(--border-color);">
+                                        <th colspan="3">Company Identity</th>
+                                        <th colspan="1" class="col-live">Live Data</th>
+                                        <th colspan="4" class="col-perf">Performance</th>
+                                        <th colspan="2" class="col-status">Status</th>
+                                    </tr>
+                                    <tr>
+                                        <th onclick="sortTable(0)">Code</th>
+                                        <th onclick="sortTable(1)">Company Name</th>
+                                        <th onclick="sortTable(2)">Market</th>
+                                        <th class="num col-live" onclick="sortTable(3)">Last Price</th>
+                                        <th class="num col-perf" onclick="sortTable(4)">Avg Daily Return</th>
+                                        <th class="num col-perf" onclick="sortTable(5)">
+                                            Std Dev
+                                            <div class="tooltip" onclick="event.stopPropagation()">
+                                                <span class="tooltip-icon">?</span>
+                                                <span class="tooltip-text">
+                                                    <strong>Standard Deviation (Volatility)</strong><br>
+                                                    Measures how much the stock price swings/fluctuates.<br>
+                                                    <br>
+                                                    <em>Example:</em> 0.0437 means daily returns typically deviate by ~4.37% from the average.<br>
+                                                    <br>
+                                                    <strong>Purpose:</strong> To assess risk. Higher Std Dev = Higher Risk.
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th class="num col-perf" onclick="sortTable(6)">1Y Return</th>
+                                        <th class="num col-perf" onclick="sortTable(7)">
+                                            Sharpe (Est)
+                                            <div class="tooltip" onclick="event.stopPropagation()">
+                                                <span class="tooltip-icon">?</span>
+                                                <span class="tooltip-text">
+                                                    <strong>Sharpe Ratio</strong><br>
+                                                    Measures return per unit of risk.<br>
+                                                    <br>
+                                                    <em>Example:</em> 0.24 means you get 0.24 units of return for every 1 unit of risk taken.<br>
+                                                    <br>
+                                                    <strong>Purpose:</strong> To measure efficiency. Higher is better (>2.0 is ideal).
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th class="col-status" onclick="sortTable(8)">Data Status</th>
+                                        <th class="col-status">Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {table_rows}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -325,76 +682,7 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
                 </div>
             </div>
 
-            <!-- TAB 4: MARKET DATA -->
-            <div id="tab-market" class="tab-content">
-                <!-- Controls -->
-                <div class="controls-bar">
-                    <div class="search-wrapper">
-                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by code or name...">
-                    </div>
-                    <div style="width: 200px;">
-                        <select id="dataFilter" onchange="filterTable()">
-                            <option value="all">Show All Stocks</option>
-                            <option value="target">Target (>6Y Data & High Return)</option>
-                            <option value="qualified">Qualified (>6Y Data)</option>
-                            <option value="has_5y">Has 5Y Data</option>
-                            <option value="unqualified">Unqualified (< 5Y Data)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="view-options">
-                        <button class="view-btn" onclick="toggleViewMenu()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                            </svg>
-                            View Options
-                        </button>
-                        <div id="viewMenu" class="view-menu">
-                            <div class="view-item" onclick="toggleColumnGroup('col-live')">
-                                <input type="checkbox" checked id="chk-live"> Live Data
-                            </div>
-                            <div class="view-item" onclick="toggleColumnGroup('col-perf')">
-                                <input type="checkbox" checked id="chk-perf"> Performance
-                            </div>
-                            <div class="view-item" onclick="toggleColumnGroup('col-status')">
-                                <input type="checkbox" checked id="chk-status"> Status
-                            </div>
-                        </div>
-                    </div>
-                    <span id="resultCount" style="margin-left: auto; font-size: 14px; color: #64748b;"></span>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-responsive">
-                        <table id="stockTable">
-                            <thead>
-                                <tr style="background: #f8fafc; border-bottom: 1px solid var(--border-color);">
-                                    <th colspan="2">Company Identity</th>
-                                    <th colspan="3" class="col-live">Live Data</th>
-                                    <th colspan="4" class="col-perf">Performance</th>
-                                    <th colspan="2" class="col-status">Status</th>
-                                </tr>
-                                <tr>
-                                    <th onclick="sortTable(0)">Code</th>
-                                    <th onclick="sortTable(1)">Company Name</th>
-                                    <th class="num col-live" onclick="sortTable(2)">Last Price</th>
-                                    <th class="num col-live" onclick="sortTable(3)">Change</th>
-                                    <th class="num col-live" onclick="sortTable(4)">% Change</th>
-                                    <th class="num col-perf" onclick="sortTable(5)">Avg Daily Return</th>
-                                    <th class="num col-perf" onclick="sortTable(6)">Std Dev</th>
-                                    <th class="num col-perf" onclick="sortTable(7)">1Y Return</th>
-                                    <th class="num col-perf" onclick="sortTable(8)">Sharpe (Est)</th>
-                                    <th class="col-status" onclick="sortTable(9)">Data Status</th>
-                                    <th class="col-status">Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {table_rows}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <!-- TAB 4: MARKET DATA (Merged into Dashboard) -->
         </div>
 
         <script>
@@ -453,23 +741,13 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
                 if (activeLink) {{
                     activeLink.classList.add('active');
                 }}
-                
-                // Update URL hash without scrolling
-                history.pushState(null, null, '#' + tabId);
             }}
-            
-            // Check hash on load
-            window.onload = function() {{
-                const hash = window.location.hash.replace('#', '');
-                if (hash && (hash === 'dashboard' || hash === 'optimization' || hash === 'market' || hash === 'guide')) {{
-                    switchTab(hash);
-                }}
-                filterTable(); // Initialize count
-            }};
 
             function filterTable() {{
                 const searchInput = document.getElementById('searchInput').value.toUpperCase();
-                const filterValue = document.getElementById('dataFilter').value;
+                const dataFilterValue = document.getElementById('dataFilter').value;
+                const marketFilterValue = document.getElementById('marketFilter').value;
+                
                 const table = document.getElementById("stockTable");
                 const tr = table.getElementsByTagName("tr");
                 let visibleCount = 0;
@@ -478,23 +756,28 @@ def generate_main_html(stocks, market_metrics, optimization_results, table_rows)
                 for (let i = 2; i < tr.length; i++) {{
                     const tdCode = tr[i].getElementsByTagName("td")[0];
                     const tdName = tr[i].getElementsByTagName("td")[1];
+                    const tdMarket = tr[i].getElementsByTagName("td")[2];
                     
                     if (tdCode && tdName) {{
                         const txtCode = tdCode.textContent || tdCode.innerText;
                         const txtName = tdName.textContent || tdName.innerText;
+                        const txtMarket = tdMarket ? (tdMarket.textContent || tdMarket.innerText) : "";
+                        
                         const matchSearch = txtCode.toUpperCase().indexOf(searchInput) > -1 || txtName.toUpperCase().indexOf(searchInput) > -1;
                         
-                        let matchFilter = true;
-                        const isTarget = tr[i].getAttribute("data-target") === "true";
+                        // 1. Check Data Status Filter
+                        let matchDataFilter = true;
                         const isQualified = tr[i].getAttribute("data-qualified") === "true";
-                        const has5y = tr[i].getAttribute("data-has5y") === "true";
                         
-                        if (filterValue === "target") matchFilter = isTarget;
-                        else if (filterValue === "qualified") matchFilter = isQualified;
-                        else if (filterValue === "has_5y") matchFilter = has5y;
-                        else if (filterValue === "unqualified") matchFilter = !has5y;
+                        if (dataFilterValue === "qualified") matchDataFilter = isQualified;
+                        else if (dataFilterValue === "unqualified") matchDataFilter = !isQualified;
+                        
+                        // 2. Check Market Filter
+                        let matchMarketFilter = true;
+                        if (marketFilterValue === "ace") matchMarketFilter = txtMarket.includes("ACE");
+                        else if (marketFilterValue === "main") matchMarketFilter = txtMarket.includes("Main");
 
-                        if (matchSearch && matchFilter) {{
+                        if (matchSearch && matchDataFilter && matchMarketFilter) {{
                             tr[i].style.display = "";
                             visibleCount++;
                         }} else {{
