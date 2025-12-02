@@ -70,21 +70,21 @@
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="metric-label">Last Price</div>
-                    <div class="metric-value">0.825</div>
+                    <div class="metric-value">0.830</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Avg Daily Return</div>
-                    <div class="metric-value text-green">1.0394%</div>
+                    <div class="metric-value text-green">1.0621%</div>
                     <div class="metric-sub text-muted">Historical Average</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Volatility (Std Dev)</div>
-                    <div class="metric-value">0.0562</div>
+                    <div class="metric-value">0.0561</div>
                     <div class="metric-sub text-muted">Daily Risk</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">1Y Return</div>
-                    <div class="metric-value text-green">0.00%</div>
+                    <div class="metric-value text-green">26.72%</div>
                     <div class="metric-sub text-muted">Past 12 Months</div>
                 </div>
             </div>
@@ -117,14 +117,15 @@
             </div>
             
             <script>
-                const priceHistory = [{"date": "2025-12-02", "year": 2025, "price": 0.824999988079071}, {"date": "2025-12-01", "year": 2025, "price": 0.8450000286102295}, {"date": "2025-11-28", "year": 2025, "price": 0.8399999737739563}, {"date": "2025-11-27", "year": 2025, "price": 0.875}, {"date": "2025-11-26", "year": 2025, "price": 0.824999988079071}, {"date": "2025-11-25", "year": 2025, "price": 0.8500000238418579}, {"date": "2025-11-24", "year": 2025, "price": 0.8450000286102295}, {"date": "2025-11-21", "year": 2025, "price": 0.8899999856948853}, {"date": "2025-11-20", "year": 2025, "price": 0.9449999928474426}, {"date": "2025-11-19", "year": 2025, "price": 0.925000011920929}, {"date": "2025-11-18", "year": 2025, "price": 0.8899999856948853}, {"date": "2025-11-17", "year": 2025, "price": 0.8949999809265137}, {"date": "2025-11-14", "year": 2025, "price": 0.8999999761581421}, {"date": "2025-11-13", "year": 2025, "price": 1.0099999904632568}, {"date": "2025-11-12", "year": 2025, "price": 1.0299999713897705}, {"date": "2025-11-11", "year": 2025, "price": 0.925000011920929}, {"date": "2025-11-10", "year": 2025, "price": 0.9449999928474426}, {"date": "2025-11-07", "year": 2025, "price": 0.8149999976158142}, {"date": "2025-11-06", "year": 2025, "price": 0.75}, {"date": "2025-11-05", "year": 2025, "price": 0.7149999737739563}, {"date": "2025-11-04", "year": 2025, "price": 0.7049999833106995}, {"date": "2025-11-03", "year": 2025, "price": 0.7049999833106995}, {"date": "2025-10-31", "year": 2025, "price": 0.7350000143051147}, {"date": "2025-10-30", "year": 2025, "price": 0.7099999785423279}, {"date": "2025-10-29", "year": 2025, "price": 0.6899999976158142}, {"date": "2025-10-28", "year": 2025, "price": 0.6600000262260437}, {"date": "2025-10-27", "year": 2025, "price": 0.6549999713897705}];
+                const priceHistory = [["2025-12-02",0.83],["2025-12-01",0.845],["2025-11-28",0.84],["2025-11-27",0.875],["2025-11-26",0.825],["2025-11-25",0.85],["2025-11-24",0.845],["2025-11-21",0.89],["2025-11-20",0.945],["2025-11-19",0.925],["2025-11-18",0.89],["2025-11-17",0.895],["2025-11-14",0.9],["2025-11-13",1.01],["2025-11-12",1.03],["2025-11-11",0.925],["2025-11-10",0.945],["2025-11-07",0.815],["2025-11-06",0.75],["2025-11-05",0.715],["2025-11-04",0.705],["2025-11-03",0.705],["2025-10-31",0.735],["2025-10-30",0.71],["2025-10-29",0.69],["2025-10-28",0.66],["2025-10-27",0.655]];
                 
                 function initHistoryTable() {
                     const yearSelect = document.getElementById('yearFilter');
                     if (!priceHistory || priceHistory.length === 0) return;
                     
-                    // Extract unique years
-                    const years = [...new Set(priceHistory.map(item => item.year))];
+                    // Extract unique years from date string "YYYY-MM-DD"
+                    // item is [date, price]
+                    const years = [...new Set(priceHistory.map(item => parseInt(item[0].substring(0, 4))))];
                     
                     // Populate dropdown
                     yearSelect.innerHTML = '';
@@ -147,7 +148,8 @@
                     tbody.innerHTML = '';
                     
                     const selectedYear = parseInt(year);
-                    const filteredData = priceHistory.filter(item => item.year === selectedYear);
+                    // Filter: item[0] is date string
+                    const filteredData = priceHistory.filter(item => parseInt(item[0].substring(0, 4)) === selectedYear);
                     
                     if (filteredData.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="2" style="padding: 10px; text-align: center; color: #64748b;">No data for this year</td></tr>';
@@ -156,9 +158,10 @@
                     
                     filteredData.forEach(item => {
                         const row = document.createElement('tr');
+                        // item[0] is date, item[1] is price
                         row.innerHTML = `
-                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item.date}</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item.price.toFixed(3)}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item[0]}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item[1].toFixed(3)}</td>
                         `;
                         tbody.appendChild(row);
                     });

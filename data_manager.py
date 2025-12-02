@@ -272,6 +272,8 @@ def load_data_from_local_datasets(datasets_dir="datasets"):
         ticker = str(row['Ticker'])
         
         s = row.to_dict()
+        # Ensure Code is 4-digit string
+        s['Code'] = str(s['Code']).zfill(4)
         s['Qualified'] = ticker in qualified_tickers
         
         if ticker in all_prices.columns:

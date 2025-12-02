@@ -70,21 +70,21 @@
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="metric-label">Last Price</div>
-                    <div class="metric-value">0.280</div>
+                    <div class="metric-value">0.285</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Avg Daily Return</div>
-                    <div class="metric-value text-red">-2.0222%</div>
+                    <div class="metric-value text-red">-1.8582%</div>
                     <div class="metric-sub text-muted">Historical Average</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Volatility (Std Dev)</div>
-                    <div class="metric-value">0.0306</div>
+                    <div class="metric-value">0.0272</div>
                     <div class="metric-sub text-muted">Daily Risk</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">1Y Return</div>
-                    <div class="metric-value text-green">0.00%</div>
+                    <div class="metric-value text-red">-17.39%</div>
                     <div class="metric-sub text-muted">Past 12 Months</div>
                 </div>
             </div>
@@ -117,14 +117,15 @@
             </div>
             
             <script>
-                const priceHistory = [{"date": "2025-12-02", "year": 2025, "price": 0.2800000011920929}, {"date": "2025-12-01", "year": 2025, "price": 0.3050000071525574}, {"date": "2025-11-28", "year": 2025, "price": 0.3199999928474426}, {"date": "2025-11-27", "year": 2025, "price": 0.32499998807907104}, {"date": "2025-11-26", "year": 2025, "price": 0.32499998807907104}, {"date": "2025-11-25", "year": 2025, "price": 0.33500000834465027}, {"date": "2025-11-24", "year": 2025, "price": 0.33000001311302185}, {"date": "2025-11-21", "year": 2025, "price": 0.33500000834465027}, {"date": "2025-11-20", "year": 2025, "price": 0.3499999940395355}, {"date": "2025-11-19", "year": 2025, "price": 0.3499999940395355}, {"date": "2025-11-18", "year": 2025, "price": 0.3449999988079071}];
+                const priceHistory = [["2025-12-02",0.285],["2025-12-01",0.305],["2025-11-28",0.32],["2025-11-27",0.325],["2025-11-26",0.325],["2025-11-25",0.335],["2025-11-24",0.33],["2025-11-21",0.335],["2025-11-20",0.35],["2025-11-19",0.35],["2025-11-18",0.345]];
                 
                 function initHistoryTable() {
                     const yearSelect = document.getElementById('yearFilter');
                     if (!priceHistory || priceHistory.length === 0) return;
                     
-                    // Extract unique years
-                    const years = [...new Set(priceHistory.map(item => item.year))];
+                    // Extract unique years from date string "YYYY-MM-DD"
+                    // item is [date, price]
+                    const years = [...new Set(priceHistory.map(item => parseInt(item[0].substring(0, 4))))];
                     
                     // Populate dropdown
                     yearSelect.innerHTML = '';
@@ -147,7 +148,8 @@
                     tbody.innerHTML = '';
                     
                     const selectedYear = parseInt(year);
-                    const filteredData = priceHistory.filter(item => item.year === selectedYear);
+                    // Filter: item[0] is date string
+                    const filteredData = priceHistory.filter(item => parseInt(item[0].substring(0, 4)) === selectedYear);
                     
                     if (filteredData.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="2" style="padding: 10px; text-align: center; color: #64748b;">No data for this year</td></tr>';
@@ -156,9 +158,10 @@
                     
                     filteredData.forEach(item => {
                         const row = document.createElement('tr');
+                        // item[0] is date, item[1] is price
                         row.innerHTML = `
-                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item.date}</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item.price.toFixed(3)}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item[0]}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f1f5f9;">${item[1].toFixed(3)}</td>
                         `;
                         tbody.appendChild(row);
                     });
